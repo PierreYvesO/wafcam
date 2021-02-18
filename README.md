@@ -1,6 +1,6 @@
 # wafcam
 
-Setup python project, with 
+Setup python environnement, with 
 ```
 pip install -r requirements.txt
 ```
