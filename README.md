@@ -1,6 +1,6 @@
 # wafcam
 
-Setup python environnement, with 
+Setup python environnement (https://docs.python.org/3/library/venv.html)
 ```
 pip install -r requirements.txt
 ```
