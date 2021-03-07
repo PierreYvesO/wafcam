@@ -28,7 +28,10 @@ def display_detected(img, detected):
 
 
 def get_rect_center(x, y, w, h):
-    centerX = int(x+w / 2)
+    """
+    Get the center of a rectangle in px point
+    """
+    centerX = int(x + w / 2)
     centerY = int(y + h / 2)
     return centerX, centerY
 
@@ -65,6 +68,8 @@ class Detection:
         self.net.setInputSwapRB(True)  # opencv utilise un mode BGR donc il faut inverser le R et B
 
         self.display = display
+
+        self.lastInfos = (0, 0)
 
     def start(self):
         """
@@ -108,7 +113,7 @@ class Detection:
                     old_x, old_y, old_w, old_h = old_box[0], old_box[1], old_box[2], old_box[3]
                     x, y, w, h = box[0], box[1], box[2], box[3]
                     offset_max = 20
-                    # TODO Ameliorer la verification avec du tracking?
+                    # TODO: Ameliorer la verification avec du tracking?
                     old_center = get_rect_center(old_x, old_y, old_w, old_h)
                     new_center = get_rect_center(x, y, w, h)
                     #Utilisation des centres pour comparer les objets detectes
@@ -131,10 +136,10 @@ class Detection:
             for className in classDetected:
                 for detect in classDetected[className]:
                     if time.time() - detect[1] > 1:
-                        print(className, "removed due to disapearance")
+                        #print(className, "removed due to disapearance")
                         classDetected[className].remove(detect)
                         if len(classDetected[className]) == 0:
-                            print("No more", className)
+                            #print("No more", className)
                             toDelete.append(className)
             for className in toDelete:
                 del classDetected[className]
@@ -145,19 +150,41 @@ class Detection:
                 display_detected(img, detected)
                 # Affichage console des objets presents dans la scene
                 for detect in classDetected:
-                    print(detect, ":", len(classDetected[detect]))
+                    # print(detect, ":", len(classDetected[detect]))
                     # print(classDetected["person"])
+                    pass
                 # Affiche l'image sur ecran
                 cv2.imshow("Output", img)
                 cv2.waitKey(1)
                 success, img = self.cap.read()
 
-            self.send_infos()
+            self.send_infos(classDetected)
 
-    def send_infos(self):
+    def send_infos(self, classDetected):
         # TODO: Filtrer les infos que l'on veut envoyer/quand envoyer par exemple a chaque fois qu'un nouvel objet
         #  cat/dog apparait dans la liste classDetected
-        #  TODO Envoi les infos vers la BDD/front
+
+        if "dog" in classDetected:
+            dogs = len(classDetected["dog"])
+        else:
+            dogs = 0
+        if "cat" in classDetected:
+            cats = len(classDetected["cat"])
+        else:
+            cats = 0
+        output = ""
+        if self.lastInfos[0] < dogs:
+            output += "dog in\n"
+        if self.lastInfos[0] > dogs:
+            output += "dog out\n"
+        if self.lastInfos[1] < cats:
+            output += "cat in\n"
+        if self.lastInfos[1] > cats:
+            output += "cat out\n"
+        if len(output) > 0:
+            self.lastInfos = (dogs, cats)
+            print(output)
+        # TODO: Envoi les infos vers la BDD/front?
         pass
 
 
