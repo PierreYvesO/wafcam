@@ -101,6 +101,7 @@ class Detection:
                     old_x, old_y, old_w, old_h = old_box[0], old_box[1], old_box[2], old_box[3]
                     x, y, w, h = box[0], box[1], box[2], box[3]
                     offset_max = 20
+                    # TODO Ameliorer la verification avec du tracking? utilisation des centres?
                     if abs(old_x - x) < offset_max and abs(old_y - y) < offset_max and \
                             abs((old_w + old_x) - (w + x)) < offset_max and abs((old_h + old_y) - (h + y)) < offset_max:
                         classDetected[className].remove(detect)
