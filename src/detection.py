@@ -20,10 +20,17 @@ def display_detected(img, detected):
         color = elmt[3]
 
         x, y, w, h = box[0], box[1], box[2], box[3]
+        cv2.circle(img, get_rect_center(x, y, w, h), radius=20, color=(0, 0, 255), thickness=2)
         cv2.rectangle(img, (x, y), (x + w, h + y), color=color, thickness=2)
         cv2.putText(img, className + "{:.2f}% ".format(confidence),
                     (box[0] + 10, box[1] + 30),
                     cv2.FONT_HERSHEY_COMPLEX, 1, (0, 255, 0), 2)
+
+
+def get_rect_center(x, y, w, h):
+    centerX = int(x+w / 2)
+    centerY = int(y + h / 2)
+    return centerX, centerY
 
 
 class Detection:
@@ -101,9 +108,11 @@ class Detection:
                     old_x, old_y, old_w, old_h = old_box[0], old_box[1], old_box[2], old_box[3]
                     x, y, w, h = box[0], box[1], box[2], box[3]
                     offset_max = 20
-                    # TODO Ameliorer la verification avec du tracking? utilisation des centres?
-                    if abs(old_x - x) < offset_max and abs(old_y - y) < offset_max and \
-                            abs((old_w + old_x) - (w + x)) < offset_max and abs((old_h + old_y) - (h + y)) < offset_max:
+                    # TODO Ameliorer la verification avec du tracking?
+                    old_center = get_rect_center(old_x, old_y, old_w, old_h)
+                    new_center = get_rect_center(x, y, w, h)
+                    #Utilisation des centres pour comparer les objets detectes
+                    if (old_center[0] - new_center[0]) < offset_max and abs(old_center[1] - new_center[1]) < offset_max:
                         classDetected[className].remove(detect)
                         isNew = False
                 if not isNew:
