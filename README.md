@@ -1,5 +1,6 @@
 # wafcam
-
+## Environement
+using python 3.8
 Setup python environnement (https://docs.python.org/3/library/venv.html)
 ```
 pip install -r requirements.txt
@@ -9,7 +10,7 @@ In case you want to add a new module to the project make sure to update the requ
 pip freeze < requirements.txt
 ```
 
-OPTIONNAL
+## UNUSED/OPTIONNAL
 (Not used at the moment but it could be possible to use GPU to detect objects)
 Tensorflow config : 
 - Update Nvidia drivers tested with 460.x versions
