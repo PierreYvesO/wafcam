@@ -9,6 +9,8 @@ In case you want to add a new module to the project make sure to update the requ
 pip freeze < requirements.txt
 ```
 
+OPTIONNAL
+(Not used at the moment but it could be possible to use GPU to detect objects)
 Tensorflow config : 
 - Update Nvidia drivers tested with 460.x versions
 - Download CUDA 11.2 [here](https://developer.nvidia.com/cuda-downloads?target_os=Windows&target_arch=x86_64&target_version=10&target_type=exelocal)
