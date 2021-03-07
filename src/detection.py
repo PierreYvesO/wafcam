@@ -74,7 +74,7 @@ class Detection:
     def start(self):
         """
         Lance la lecture du flux video et de la detection des objets
-        :return:
+        :return: None (potential infinite loop)
         """
         success, img = self.cap.read()  # Lecture de la 1ere frame
         if not success:
@@ -129,7 +129,7 @@ class Detection:
                 # ajout a la liste des objets detectés dans la frame
                 detected.append((box, className, confs[i] * 100, color))
 
-            # Dna sle cas de faux positifs, la detection est en general tres succinte, pour palier a ce probleme et
+            # Dans le cas de faux positifs, la detection est en general tres succinte, pour palier a ce probleme et
             # eviter que ces erreurs de detection influe sur les resultats de la detection, on supprime les objets
             # detectes il y a plus d'1 seconde et on supprime la cle du dictionnaire si besoin.
             toDelete = list()
