@@ -10,7 +10,7 @@ In case you want to add a new module to the project make sure to update the requ
 pip freeze < requirements.txt
 ```
 
-## UNUSED/OPTIONNAL
+## Unused/Optional Setup
 <details><summary>GPU Config</summary>
 
 (Not used at the moment but it could be possible to use GPU to detect objects)
