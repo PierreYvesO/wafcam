@@ -12,7 +12,7 @@ pip freeze < requirements.txt
 
 ## UNUSED/OPTIONNAL
 <details><summary>GPU Config</summary>
-<p>
+
 (Not used at the moment but it could be possible to use GPU to detect objects)
 Tensorflow config : 
 - Update Nvidia drivers tested with 460.x versions
@@ -22,6 +22,6 @@ Tensorflow config :
     ```
   python -c "import tensorflow as tf;print(tf.reduce_sum(tf.random.normal([1000, 1000])))"
     ```
-</p>
+
 </details>
 
