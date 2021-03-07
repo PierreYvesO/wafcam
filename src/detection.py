@@ -155,7 +155,9 @@ class Detection:
             self.send_infos()
 
     def send_infos(self):
-        # TODO Envoi les infos vers la BDD/front
+        # TODO: Filtrer les infos que l'on veut envoyer/quand envoyer par exemple a chaque fois qu'un nouvel objet
+        #  cat/dog apparait dans la liste classDetected
+        #  TODO Envoi les infos vers la BDD/front
         pass
 
 
