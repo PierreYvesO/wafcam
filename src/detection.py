@@ -1,9 +1,12 @@
 import time
 import cv2
 import numpy as np
+import math
 
 LIMITE_CONF = 0.6  # limite de confiance de detection
-LIMITE_CONF_NMS = 0.2  # limite de confiance pour l'algo NMS
+LIMITE_CONF_NMS = 0.3  # limite de confiance pour l'algo NMS
+TRACKING_OFFSET = 80
+TIME_LIMIT = 2
 
 
 def display_detected(img, detected):
@@ -83,6 +86,7 @@ class Detection:
         classDetected = {}  # Liste des objects detecté dans la scene pendant 1s
         while success:
             detected = list()  # liste des objets detectes
+
             classIds, confs, bbox = self.net.detect(img, confThreshold=LIMITE_CONF)  # detection des objets
             bbox = list(bbox)  # liste des postions
             confs = list(np.array(confs).reshape(1, -1)[0])
@@ -96,6 +100,7 @@ class Detection:
             # detecté a deja ete trouvé dans une frame precedente ou c'est un nouveau
             isNew = True
 
+            temp_detected = list()
             # Parcours des objets trouves
             for idx in indices:
                 i = idx[0]
@@ -108,26 +113,24 @@ class Detection:
                 # Verifie si l'objet trouvé etait deja présent dans les frame precedentes
                 # isNew est marqué False et l'objet est supprimé de la liste
                 # la verification se fait par position des 4 coins
-                for detect in classDetected[className]:
-                    old_box = detect[0]
-                    old_x, old_y, old_w, old_h = old_box[0], old_box[1], old_box[2], old_box[3]
-                    x, y, w, h = box[0], box[1], box[2], box[3]
-                    offset_max = 20
-                    # TODO: Ameliorer la verification avec du tracking?
-                    old_center = get_rect_center(old_x, old_y, old_w, old_h)
-                    new_center = get_rect_center(x, y, w, h)
-                    #Utilisation des centres pour comparer les objets detectes
-                    if (old_center[0] - new_center[0]) < offset_max and abs(old_center[1] - new_center[1]) < offset_max:
-                        classDetected[className].remove(detect)
-                        isNew = False
+                new_center = get_rect_center(box[0], box[1], box[2], box[3])
+                objectIndice, objectDist = self.tracked_object(new_center, classDetected[className])
+
+                if objectDist < TRACKING_OFFSET and objectIndice != 1:
+                    del classDetected[className][objectIndice]
+                    isNew = False
                 if not isNew:
                     color = (255, 0, 0)  # Bleu si l'objet est deja connu
                 else:
                     color = (0, 255, 0)  # Vert so c'est un nouvel objet
                 # Ajout du nouvel element detecté dans la liste
-                classDetected[className].append((box.tolist(), time.time()))
+                temp_detected.append((className, (new_center, time.time())))
+
                 # ajout a la liste des objets detectés dans la frame
                 detected.append((box, className, confs[i] * 100, color))
+            for elmt in temp_detected:
+                classDetected[elmt[0]].append(elmt[1])
+            self.remove_similar_centers(classDetected)
 
             # Dans le cas de faux positifs, la detection est en general tres succinte, pour palier a ce probleme et
             # eviter que ces erreurs de detection influe sur les resultats de la detection, on supprime les objets
@@ -135,12 +138,11 @@ class Detection:
             toDelete = list()
             for className in classDetected:
                 for detect in classDetected[className]:
-                    if time.time() - detect[1] > 1:
-                        #print(className, "removed due to disapearance")
+                    if time.time() - detect[1] > TIME_LIMIT:
                         classDetected[className].remove(detect)
                         if len(classDetected[className]) == 0:
-                            #print("No more", className)
                             toDelete.append(className)
+
             for className in toDelete:
                 del classDetected[className]
 
@@ -150,9 +152,7 @@ class Detection:
                 display_detected(img, detected)
                 # Affichage console des objets presents dans la scene
                 for detect in classDetected:
-                    # print(detect, ":", len(classDetected[detect]))
-                    # print(classDetected["person"])
-                    pass
+                    print(detect, ":", len(classDetected[detect]))
                 # Affiche l'image sur ecran
                 cv2.imshow("Output", img)
                 cv2.waitKey(1)
@@ -161,9 +161,6 @@ class Detection:
             self.send_infos(classDetected)
 
     def send_infos(self, classDetected):
-        # TODO: Filtrer les infos que l'on veut envoyer/quand envoyer par exemple a chaque fois qu'un nouvel objet
-        #  cat/dog apparait dans la liste classDetected
-
         if "dog" in classDetected:
             dogs = len(classDetected["dog"])
         else:
@@ -186,6 +183,44 @@ class Detection:
             print(output)
         # TODO: Envoi les infos vers la BDD/front?
         pass
+
+    def tracked_object(self, new_center, detectedObjects):
+        """
+        Recupere le potentiel objet detecté precedemment qui correspond à l'objet detecté actuellement.
+        Cela permet de suivre un objet sans l'identifier comme nouveau
+        :param new_center: centre de l'objet nouvelement detecté
+        :param detectedObjects: liste des objets de la meme className dans el buffer d'objet detecté
+        :return: index de l'objet correspondant dans le buffer et distance entre les 2 centres
+        """
+        minIndex = -1
+        minDist = 99999
+        for i in range(0, len(detectedObjects)):
+            dist = math.dist(new_center, detectedObjects[i][0])
+            if dist < minDist:
+                minDist = dist
+                minIndex = i
+
+        return minIndex, minDist
+
+    def remove_similar_centers(self, classDetected):
+        for detected in classDetected:
+            points = [elmt[0] for elmt in classDetected[detected]]
+            print(points)
+            md = 10  # max distance allowed between two points
+            points.sort()
+            to_remove = set()  # keep track of items to be removed
+
+            for i, point in enumerate(points):
+                if i == len(points) - 1:
+                    break
+                other_point = points[i + 1]
+                if abs(point[0] - other_point[0]) <= md and abs(point[1] - other_point[1]) <= md:
+                    to_remove.add(i)
+
+            for point in to_remove:
+                del classDetected[detected][point]
+
+            print(points)
 
 
 if __name__ == '__main__':
