@@ -96,8 +96,9 @@ class Detection:
                 confs = list(np.array(confs).reshape(1, -1)[0])
                 confs = list(map(float, confs))  # liste des degrés de confiance
 
-                # Pour eviter le chevauchement des detections d'objet et eviter les doublons, on applique un algorithme NMS
-                # (Non-Maximum Suppression) qui va essayer de creer une detection commune d'un meme objet
+                # Pour eviter le chevauchement des detections d'objet et eviter les doublons, on applique un
+                # algorithme NMS (Non-Maximum Suppression) qui va essayer de creer une detection commune d'un meme
+                # objet
                 indices = cv2.dnn.NMSBoxes(bbox, confs, LIMITE_CONF, LIMITE_CONF_NMS)
 
                 # grace au NMS, la position d'un objet detecté est plsu stable, on peut odnc essayer de voir si l'objet
@@ -207,7 +208,7 @@ class Detection:
     def remove_similar_centers(self, classDetected):
         for detected in classDetected:
             points = [elmt[0] for elmt in classDetected[detected]]
-            md = 10  # max distance allowed between two points
+            md = 20  # max distance allowed between two points
             points.sort()
             to_remove = set()  # keep track of items to be removed
 
