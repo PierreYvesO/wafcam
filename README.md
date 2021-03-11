@@ -10,6 +10,35 @@ In case you want to add a new module to the project make sure to update the requ
 pip freeze < requirements.txt
 ```
 
+## Setup WAMP (on Windows 10)
+Version : 3.2.3
+
+Installation guide
+- Choose your language
+- Choose the folder destination for WAMP
+- Install the default configuration
+    - PHP 7.3.21
+    - MySQL 5.7.31
+    - PhpMyAdmin 5.0.2
+- Choose your default IDE and browser
+
+## React app
+Install node (https://nodejs.org/en/download/)
+
+node version : 14.16.0
+
+npm version : 6.14.11
+
+Add those libraries
+```
+npm i -s react-dom react-router-dom node-sass@4.14.1
+```
+
+Now you can start the application and see the URL where your app is running (http://localhost:3000 for example)
+```
+npm start
+```
+
 ## Unused/Optional Setup
 <details><summary>GPU Config</summary>
 
@@ -24,15 +53,3 @@ Tensorflow config :
     ```
 
 </details>
-
-## Setup WAMP (on Windows 10)
-Version : 3.2.3
-
-Installation guide
-- Choose your language
-- Choose the folder destination for WAMP
-- Install the default configuration
-    - PHP 7.3.21
-    - MySQL 5.7.31
-    - PhpMyAdmin 5.0.2
-- Choose your default IDE and browser
