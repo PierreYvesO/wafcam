@@ -34,7 +34,7 @@ Add those libraries
 npm i -s react-dom react-router-dom node-sass@4.14.1
 ```
 
-Now u can start the application and see the URL where your app is running (http://localhost:3000 for example)
+Now you can start the application and see the URL where your app is running (http://localhost:3000 for example)
 ```
 npm start
 ```
