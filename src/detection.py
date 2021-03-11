@@ -41,18 +41,14 @@ def get_rect_center(x, y, w, h):
 
 
 class Detection:
-    def __init__(self, video_path=0, size=(1280, 720), display=False):
+    def __init__(self, camera, display=False):
         """
         Initialise un flux video ou la detection sera fait
-        :param video_path: 0=(webcam), port@ip (camera ip)
+        :param capture: feed to read on
         :param size: taille de l'image rentrante
         :param display: afficher un visuel opencv de la camera (debug)
         """
-        # Parametres capture video
-        self.cap = cv2.VideoCapture(video_path)
-        self.cap.set(3, size[0])
-        self.cap.set(4, size[1])
-        self.cap.set(10, 150)
+        self.cam = camera
 
         # Lecture de la liste des objets detetable
         self.classNames: list
@@ -74,20 +70,23 @@ class Detection:
         self.display = display
 
         self.lastInfos = (0, 0)
+        self.isOn = False
 
     def start(self):
         """
         Lance la lecture du flux video et de la detection des objets
         :return: None (potential infinite loop)
         """
-        success, img = self.cap.read()  # Lecture de la 1ere frame
-        if not success:
+
+        # test d'une lecture de premiereframe
+        sucess, _ = self.cam.getFrame()
+        if not sucess:
             raise Exception("Impossible d'ouvrir le flux video donné")
         detected = list()  # liste des objets detectes
         start_time = time.time()
         classDetected = {}  # Liste des objects detecté dans la scene pendant 1s
-        while success:
-            success, img = self.cap.read()
+        while sucess and self.isOn:
+            sucess, img = self.cam.getFrame()
             if time.time() - start_time > FRAME_TIMER:
                 detected = list()  # liste des objets detectes
                 start_time = time.time()
@@ -101,7 +100,7 @@ class Detection:
                 # objet
                 indices = cv2.dnn.NMSBoxes(bbox, confs, LIMITE_CONF, LIMITE_CONF_NMS)
 
-                # grace au NMS, la position d'un objet detecté est plsu stable, on peut odnc essayer de voir si l'objet
+                # grace au NMS, la position d'un objet detecté est plus stable, on peut odnc essayer de voir si l'objet
                 # detecté a deja ete trouvé dans une frame precedente ou c'est un nouveau
                 isNew = True
 
@@ -155,8 +154,8 @@ class Detection:
                 display_detected(img, detected)
 
                 # Affichage console des objets presents dans la scene
-                for detect in classDetected:
-                    print(detect, ":", len(classDetected[detect]))
+                # for detect in classDetected:
+                #     print(detect, ":", len(classDetected[detect]))
                 # Affiche l'image sur ecran
                 cv2.imshow("Output", img)
                 cv2.waitKey(1)
@@ -186,6 +185,9 @@ class Detection:
             print(output)
         # TODO: Envoi les infos vers la BDD/front?
         pass
+
+    def get_last_infos(self):
+        return self.lastInfos
 
     def tracked_object(self, new_center, detectedObjects):
         """
@@ -222,7 +224,13 @@ class Detection:
             for point in to_remove:
                 del classDetected[detected][point]
 
+    def stop_detection(self):
+        self.isOn = False
+
 
 if __name__ == '__main__':
-    detection = Detection(display=True)
+    from camera import Camera
+    cam = Camera("http://192.168.1.71:8080/stream.mjpeg", size=(1280, 70))
+    detection = Detection(cam, display=True)
     detection.start()
+
