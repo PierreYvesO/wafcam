@@ -1,4 +1,6 @@
 import time
+from threading import Thread
+
 import cv2
 import numpy as np
 import math
@@ -40,15 +42,18 @@ def get_rect_center(x, y, w, h):
     return centerX, centerY
 
 
-class Detection:
-    def __init__(self, camera, display=False):
+class Detection(Thread):
+    def __init__(self, queue, camera, detection_result, display=False):
         """
         Initialise un flux video ou la detection sera fait
         :param capture: feed to read on
         :param size: taille de l'image rentrante
         :param display: afficher un visuel opencv de la camera (debug)
         """
+        super().__init__()
+        self.queue = queue
         self.cam = camera
+        self.result = detection_result
 
         # Lecture de la liste des objets detetable
         self.classNames: list
@@ -72,7 +77,11 @@ class Detection:
         self.lastInfos = (0, 0)
         self.isOn = False
 
-    def start(self):
+    def startProcess(self):
+        self.isOn = True
+        self.run()
+
+    def run(self):
         """
         Lance la lecture du flux video et de la detection des objets
         :return: None (potential infinite loop)
@@ -85,7 +94,7 @@ class Detection:
         detected = list()  # liste des objets detectes
         start_time = time.time()
         classDetected = {}  # Liste des objects detecté dans la scene pendant 1s
-        while sucess and self.isOn:
+        while sucess and self.queue.empty():
             sucess, img = self.cam.getFrame()
             if time.time() - start_time > FRAME_TIMER:
                 detected = list()  # liste des objets detectes
@@ -154,8 +163,8 @@ class Detection:
                 display_detected(img, detected)
 
                 # Affichage console des objets presents dans la scene
-                # for detect in classDetected:
-                #     print(detect, ":", len(classDetected[detect]))
+                for detect in classDetected:
+                    print(detect, ":", len(classDetected[detect]))
                 # Affiche l'image sur ecran
                 cv2.imshow("Output", img)
                 cv2.waitKey(1)
@@ -183,7 +192,8 @@ class Detection:
         if len(output) > 0:
             self.lastInfos = (dogs, cats)
             print(output)
-        # TODO: Envoi les infos vers la BDD/front?
+            # Send back infos to camera
+            self.result.put(self.lastInfos)
         pass
 
     def get_last_infos(self):
@@ -230,7 +240,8 @@ class Detection:
 
 if __name__ == '__main__':
     from camera import Camera
-    cam = Camera("http://192.168.1.71:8080/stream.mjpeg", size=(1280, 70))
-    detection = Detection(cam, display=True)
-    detection.start()
 
+    cam = Camera("http://192.168.1.71:8080/stream.mjpeg", 1, size=(1280, 720))
+    print("sleep")
+    time.sleep(5)
+    cam.releaseCamera()
