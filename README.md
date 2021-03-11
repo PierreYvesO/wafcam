@@ -25,3 +25,14 @@ Tensorflow config :
 
 </details>
 
+## Setup WAMP (on Windows 10)
+Version : 3.2.3
+
+Installation guide
+- Choose your language
+- Choose the folder destination for WAMP
+- Install the default configuration
+    - PHP 7.3.21
+    - MySQL 5.7.31
+    - PhpMyAdmin 5.0.2
+- Choose your default IDE and browser
