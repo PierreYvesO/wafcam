@@ -7,6 +7,8 @@ class Camera:
     def __init__(self, ip, size=tuple()):
         self.ip = ip
         self.cap = 0
+        self.size = size
+
 
         self.startCamera()
 
@@ -15,6 +17,11 @@ class Camera:
             self.cap = cv2.VideoCapture(0)
         else:
             self.cap = cv2.VideoCapture(str(self.ip))
+        if len(self.size) == 2:
+            # Parametres capture video
+            self.cap.set(3, self.size[0])
+            self.cap.set(4, self.size[1])
+            self.cap.set(10, 150)
 
     def displayCamera(self):
         ret, frame = self.getFrame()
