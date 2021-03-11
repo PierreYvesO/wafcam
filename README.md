@@ -24,7 +24,9 @@ Installation guide
 
 ## React app
 Install node (https://nodejs.org/en/download/)
+
 node version : 14.16.0
+
 npm version : 6.14.11
 
 Add those libraries
