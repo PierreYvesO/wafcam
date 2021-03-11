@@ -36,3 +36,18 @@ Installation guide
     - MySQL 5.7.31
     - PhpMyAdmin 5.0.2
 - Choose your default IDE and browser
+
+## React app
+Install node (https://nodejs.org/en/download/)
+node version : 14.16.0
+npm version : 6.14.11
+
+Add those libraries
+```
+npm i -s react-dom react-router-dom node-sass@4.14.1
+```
+
+Now u can start the application and see the URL where your app is running (http://localhost:3000 for example)
+```
+npm start
+```
