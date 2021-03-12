@@ -1,13 +1,13 @@
-# wafcam
+# WAFCAM
 
-## How to setup web client
+## Deploy your local server with Web App (Build v1)
 
-1- Install WAMP Server
-2- Install NodeJS
-3- Install NPM
+1. Install WAMP Server
+2. Install NodeJS
+3. Install NPM
 
 ### Setup WAMP Server (on Windows 10)
-Version : 3.2.3
+> Version : 3.2.3
 
 Installation guide :
 - Choose your language
@@ -18,23 +18,26 @@ Installation guide :
     - PhpMyAdmin 5.0.2
 - Choose your default IDE and browser
 
-### React app
-Install node (https://nodejs.org/en/download/)
+### Setup Web App
+Install NodeJS and NPM 
+> https://nodejs.org/en/download/
 
-Check your version of NodeJS and NPM : (nodeJS - 14.16.0 | npm - 6.14.11)
+Check your version of NodeJS and NPM :
 ```
 node -v
 ```
+> nodeJS project version : 14.16.0
 ```
 npm -v
 ```
+> npm project version : 6.14.11
 
 Change the folder directory
 ```
 cd wafcam/web
 ```
 
-Install/update your dependancies
+Install/update your dependencies
 ```
 npm install
 ```
@@ -48,6 +51,8 @@ npm start
 ```
 npm run build
 ```
+
+###
 
 ## How to setup back environment
 
