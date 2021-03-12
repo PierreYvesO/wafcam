@@ -1,18 +1,11 @@
 import mysql.connector
-from datetime import datetime
-config = {
-    'user': ' 2z2tz_admin',
-    'password': 'PaTcAm78',
-    'host': '2z2tz.myd.infomaniak.com',
-    'database': '2z2tz_patcam_prod',
-    'raise_on_warnings': True
-}
+from python_back.src.database_utils import config as prod_config
 
 
 class Database:
     def __init__(self, user_config=None):
         if user_config is None:
-            self.db = mysql.connector.connect(**config)
+            self.db = mysql.connector.connect(**prod_config)
         else:
             self.db = mysql.connector.connect(**user_config)
 
