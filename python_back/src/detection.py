@@ -5,10 +5,10 @@ import cv2
 import numpy as np
 import math
 
-LIMITE_CONF = 0.5  # limite de confiance de detection
-LIMITE_CONF_NMS = 0.6  # limite de confiance pour l'algo NMS
+LIMITE_CONF = 0.6  # limite de confiance de detection
+LIMITE_CONF_NMS = 0.3  # limite de confiance pour l'algo NMS
 TRACKING_OFFSET = 80
-TIME_LIMIT = 1
+TIME_LIMIT = 2
 FRAME_TIMER = .2
 
 
@@ -164,8 +164,6 @@ class Detection(Thread):
                 for detect in classDetected:
                     print(detect, ":", len(classDetected[detect]))
 
-                # width = int(img.shape[1] * scale_percent / 100)
-                # height = int(img.shape[0] * scale_percent / 100)
                 # Affiche l'image sur ecran
                 cv2.imshow("Output", img)
                 cv2.waitKey(1)
