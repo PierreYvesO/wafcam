@@ -44,6 +44,11 @@ Now you can start the application and see the URL where your app is running (htt
 npm start
 ```
 
+(Optional: if you need to build your project from React App) 
+```
+npm run build
+```
+
 ## How to setup back environment
 
 1- Install Python Environment
