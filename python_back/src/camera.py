@@ -1,20 +1,20 @@
 import asyncio
-import time
 
 import cv2
-from detection import Detection
+from python_back.src.detection import  Detection
 from cv2.cv2 import VideoCapture
 from queue import Queue
 
 
 class Camera:
-    def __init__(self, ip, cam_id, size=tuple(), display = False):
+    def __init__(self, ip, cam_id, size=tuple(), display=False):
         self.ip = ip
         self.display = display
         self.id = cam_id
         self.size = size
         self.cap: VideoCapture = 0
         self.startCamera()
+        asyncio.run(self.save_infos())
 
     def startCamera(self):
         if self.ip == 0:
@@ -66,8 +66,4 @@ class Camera:
             await asyncio.sleep(1)
 
 
-if __name__ == '__main__':
-    cam = Camera("http://192.168.1.71:8080/stream.mjpeg", 1, size=(1280, 720), display=True)
-    asyncio.run(cam.save_infos())
-    cam.displayCamera()
-    cam.releaseCamera()
+

@@ -5,8 +5,8 @@ import cv2
 import numpy as np
 import math
 
-LIMITE_CONF = 0.6  # limite de confiance de detection
-LIMITE_CONF_NMS = 0.3  # limite de confiance pour l'algo NMS
+LIMITE_CONF = 0.5  # limite de confiance de detection
+LIMITE_CONF_NMS = 0.6  # limite de confiance pour l'algo NMS
 TRACKING_OFFSET = 80
 TIME_LIMIT = 1
 FRAME_TIMER = .2
@@ -75,10 +75,8 @@ class Detection(Thread):
         self.display = display
 
         self.lastInfos = (0, 0)
-        self.isOn = False
 
     def startProcess(self):
-        self.isOn = True
         self.run()
 
     def run(self):
@@ -165,6 +163,9 @@ class Detection(Thread):
                 # Affichage console des objets presents dans la scene
                 for detect in classDetected:
                     print(detect, ":", len(classDetected[detect]))
+
+                # width = int(img.shape[1] * scale_percent / 100)
+                # height = int(img.shape[0] * scale_percent / 100)
                 # Affiche l'image sur ecran
                 cv2.imshow("Output", img)
                 cv2.waitKey(1)
@@ -172,6 +173,10 @@ class Detection(Thread):
             self.send_infos(classDetected)
 
     def send_infos(self, classDetected):
+        """
+        Dtecte si des nouveaux chats/chiens ont été detectés ou ont disparu et stocke le compteur chat/chien
+        :param classDetected:
+        """
         if "dog" in classDetected:
             dogs = len(classDetected["dog"])
         else:
@@ -192,12 +197,10 @@ class Detection(Thread):
         if len(output) > 0:
             self.lastInfos = (dogs, cats)
             print(output)
-            # Send back infos to camera
+            # Envoie les infos vers la camera
+            with self.result.mutex:
+                self.result.queue.clear()
             self.result.put(self.lastInfos)
-        pass
-
-    def get_last_infos(self):
-        return self.lastInfos
 
     def tracked_object(self, new_center, detectedObjects):
         """
@@ -218,6 +221,10 @@ class Detection(Thread):
         return minIndex, minDist
 
     def remove_similar_centers(self, classDetected):
+        """
+        Detecte les elements similaires d'une classe et les fusionne
+        :param classDetected: dictionnaire classname : elmts
+        """
         for detected in classDetected:
             points = [elmt[0] for elmt in classDetected[detected]]
             md = 20  # max distance allowed between two points
@@ -232,16 +239,8 @@ class Detection(Thread):
                     to_remove.add(i)
 
             for point in to_remove:
-                del classDetected[detected][point]
+                try:
+                    del classDetected[detected][point]
+                except:
+                    print(point, classDetected[detected])
 
-    def stop_detection(self):
-        self.isOn = False
-
-
-if __name__ == '__main__':
-    from camera import Camera
-
-    cam = Camera("http://192.168.1.71:8080/stream.mjpeg", 1, size=(1280, 720))
-    print("sleep")
-    time.sleep(5)
-    cam.releaseCamera()
