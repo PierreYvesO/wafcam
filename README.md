@@ -31,7 +31,7 @@ npm version : 6.14.11
 
 Add those libraries
 ```
-npm i -s react-dom react-router-dom node-sass@4.14.1 express body-parser mysql
+npm i -s react-dom react-router-dom node-sass@4.14.1 express body-parser mysql @material-ui/core @material-ui/icons
 ```
 
 Now you can start the application and see the URL where your app is running (http://localhost:3000 for example)
