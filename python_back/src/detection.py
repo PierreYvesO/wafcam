@@ -198,7 +198,8 @@ class Detection(Thread):
             # Envoie les infos vers la camera
             with self.result.mutex:
                 self.result.queue.clear()
-            self.result.put(self.lastInfos)
+            animalDict = {"dog": self.lastInfos[0], "cat": self.lastInfos[1]}
+            self.result.put(animalDict)
 
     def tracked_object(self, new_center, detectedObjects):
         """
