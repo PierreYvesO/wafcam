@@ -8,6 +8,7 @@ const Rooms = (props) => {
   const columns = [
     { field: 'id', headerName: 'ID', width: 100 },
     { field: 'name', headerName: 'Nom', width: 130 },
+    { field: 'camera', headerName: 'Caméra IP', width: 130 },
   ];
 
   return (
