@@ -43,8 +43,8 @@ class Database:
         return res
 
     def getRooms(self):
-        self.processing = True
         self.wait_available()
+        self.processing = True
         cursor = self.db.cursor(prepared=True)
         cursor.execute("SELECT {1} FROM {0}".format(*ROOM_TABLE))
         res = cursor.fetchall()
