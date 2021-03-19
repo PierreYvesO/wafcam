@@ -84,6 +84,28 @@ def similar_point(p1, p2):
     return abs(p1[0] - p2[0]) <= SIMILAR_THRESHOLD and abs(p1[1] - p2[1]) <= SIMILAR_THRESHOLD
 
 
+def is_in_area(objectBox, forbiddenBoxes):
+    totalArea = 0
+    for forbiddenBox in forbiddenBoxes:
+        totalArea += intersection_area(objectBox, forbiddenBox)
+    objectArea = objectBox[2] * objectBox[3]
+    if totalArea > objectArea or objectArea / totalArea > .25:
+        return True
+    else:
+        return False
+
+
+def intersection_area(boxA, boxB):
+    xA, yA, wA, hA = boxA
+    xB, yB, wB, hB = boxB
+    x1 = max(min(xA, xA + wA), min(xB, xB + wB))
+    y1 = max(min(yA, yA + hA), min(yB, yB + hB))
+    x2 = min(max(xA, xA + wA), max(xB, xB + wB))
+    y2 = min(max(yA, yA + hA), max(yB, yB + hB))
+
+    return (x2 - x1) * (y2 - y1) if x1 < x2 and y1 < y2 else 0
+
+
 def tracked_object(new_center, detectedObjects):
     """
     Recupere le potentiel objet detecté precedemment qui correspond à l'objet detecté actuellement.
@@ -270,8 +292,11 @@ class Detection(Thread):
 
 
 if __name__ == '__main__':
-    test = {"a": [((0, 1), 5), ((0, 2), 3), ((30, 50), 1), ((1, 3), 5), ((0, 4), 8)]}
-    test['a'].sort()
-    print(test)
-    remove_similar_centers(test)
-    print(test)
+    print(intersection_area([0, 0, 20, 20], [15, 15, 10, 10]))
+    rep = is_in_area([3, 3, 13, 13], [[0, 0, 20, 20], [15, 15, 10, 10]])
+    print(rep)
+    # test = {"a": [((0, 1), 5), ((0, 2), 3), ((30, 50), 1), ((1, 3), 5), ((0, 4), 8)]}
+    # test['a'].sort()
+    # print(test)
+    # remove_similar_centers(test)
+    # print(test)
