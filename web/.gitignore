@@ -10,6 +10,7 @@
 
 # production
 /build
+/bdd_backup
 
 # misc
 .DS_Store

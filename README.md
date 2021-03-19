@@ -1,5 +1,70 @@
-# wafcam
-## Environement
+# WAFCAM
+
+## Deploy your local server with Web App (Build v1)
+
+1. Install WAMP Server
+2. Add React Build to Local Server
+
+### Setup Local Server (Wamp Server on Windows 10)
+> Version : 3.2.3
+
+Installation guide :
+- Choose your language
+- Choose the folder destination for WAMP
+- Install the default configuration
+    - PHP 7.3.21
+    - MySQL 5.7.31
+    - PhpMyAdmin 5.0.2
+- Choose your default IDE and browser
+
+### Add Web App Build To Local Server
+Deployment guilde :
+- On GITHUB website, choice your build version on branches (e.j build-v1)
+- Get the link and clone it on your "/www" local repository
+
+> Optional : if you want to make your own build, [check it out](#web-app-environment)
+
+## Development Setup
+
+1- Install Web App Environment
+2- Install Python Environment
+3- Setup your GPU (optional)
+
+### Web App Environment
+Install NodeJS and NPM 
+> https://nodejs.org/en/download/
+
+Check your version of NodeJS and NPM :
+```
+node -v
+```
+> nodeJS project version : 14.16.0
+```
+npm -v
+```
+> npm project version : 6.14.11
+
+Change the folder directory
+```
+cd wafcam/web
+```
+
+Install/update your dependencies
+```
+npm install
+```
+
+Now you can start the application and see the URL where your app is running (http://localhost:3000 for example)
+```
+npm start
+```
+
+(Optional: if you need to build your project from React App) 
+```
+npm run build
+```
+
+### Python
 using python 3.8
 Setup python environnement (https://docs.python.org/3/library/venv.html)
 ```
@@ -10,36 +75,7 @@ In case you want to add a new module to the project make sure to update the requ
 pip freeze < requirements.txt
 ```
 
-## Setup WAMP (on Windows 10)
-Version : 3.2.3
-
-Installation guide
-- Choose your language
-- Choose the folder destination for WAMP
-- Install the default configuration
-    - PHP 7.3.21
-    - MySQL 5.7.31
-    - PhpMyAdmin 5.0.2
-- Choose your default IDE and browser
-
-## React app
-Install node (https://nodejs.org/en/download/)
-
-node version : 14.16.0
-
-npm version : 6.14.11
-
-Add those libraries
-```
-npm i -s react-dom react-router-dom node-sass@4.14.1 express body-parser mysql @material-ui/core @material-ui/icons
-```
-
-Now you can start the application and see the URL where your app is running (http://localhost:3000 for example)
-```
-npm start
-```
-
-## Unused/Optional Setup
+### Unused/Optional Setup
 <details><summary>GPU Config</summary>
 
 (Not used at the moment but it could be possible to use GPU to detect objects)

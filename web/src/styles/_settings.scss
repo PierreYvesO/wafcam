@@ -41,7 +41,24 @@ a:visited {
   flex: 1;
   height: min-content;
   width: 15%;
+  .MuiSvgIcon-root {
+    margin-right: 20px;
+  }
 }
-.MuiSvgIcon-root {
-  margin-right: 20px;
+.camTool {
+  position: relative;
+  .konvajs-content {
+    position: absolute !important;
+    top: 0px;
+  }
+  img {
+    width: 100%;
+  }
+  .buttons {
+    display: flex;
+    justify-content: space-between;
+  }
+  button {
+    margin-right: 15px;
+  }
 }
