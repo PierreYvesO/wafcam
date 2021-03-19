@@ -1,7 +1,8 @@
 import asyncio
+from datetime import datetime
 
 import cv2
-from python_back.src.detection import  Detection
+from python_back.src.detection import Detection
 from python_back.src.database import *
 from cv2.cv2 import VideoCapture
 from queue import Queue
@@ -30,7 +31,7 @@ class Camera:
             self.cap.set(10, 150)
         self.detection_queue = Queue()
         self.detection_result = Queue()
-        self.detection = Detection(self.detection_queue, self, self.detection_result, self.display)
+        self.detection = Detection(self.detection_queue, self, self.detection_result, self.db.getEntities(), self.display)
         self.detection.start()
 
     def displayCamera(self):
@@ -61,16 +62,19 @@ class Camera:
         return self.id
 
     async def save_infos(self):
+        from _queue import Empty
+        res = {}
         while True:
-
             # TODO: send data to BDD
-            res = self.detection_result.get()
-            # on garde la meme date pour tous les envois
-            time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            for animal in res:
-                self.db.addLog(animal, res[animal], self.id, time)
-            print("result = " + str(res))
+            try:
+                res = self.detection_result.get(timeout=5)
+                print("try",  res)
+            except Empty:
+                print("Except",  res)
+                # on garde la meme date pour tous les envois
+                time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                for animal in res:
+                    self.db.addLog(animal, res[animal], self.id, time)
+                print("result = " + str(res))
+                res = {}
             await asyncio.sleep(1)
-
-
-
