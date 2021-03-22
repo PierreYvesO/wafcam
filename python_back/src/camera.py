@@ -6,7 +6,7 @@ from python_back.src.detection import Detection
 from python_back.src.database import *
 from cv2.cv2 import VideoCapture
 from queue import Queue
-from python_back.src.database_utils import user_config as user_config
+from python_back.src.database_utils import read_env
 from multiprocessing import Queue as mQueue
 
 
@@ -19,7 +19,7 @@ class Camera:
         self.size = size
         self.cap: VideoCapture
         self.detection: Detection
-        self.db = Database(user_config)
+        self.db = Database(read_env())
         self.startCamera()
         asyncio.run(self.save_infos())
 
