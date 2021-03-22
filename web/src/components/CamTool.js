@@ -139,7 +139,6 @@ class CamTool extends React.Component {
 
   render () {
     const { width, height, editMode } = this.props;
-    console.log(this.state.rectangles)
     return (
       <>
         <Stage

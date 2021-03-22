@@ -3,6 +3,7 @@ import Navigation from '../components/Navigation';
 import CamTool from '../components/CamTool';
 import { Button } from '@material-ui/core';
 import { Edit, Save, AddBox, Delete } from '@material-ui/icons';
+import axios from 'axios';
 
 class Cameras extends React.Component {
   constructor(props) {
@@ -11,8 +12,10 @@ class Cameras extends React.Component {
   }
 
   state = {
-    imgHeight: 0,
-    imgWidth: 0,
+    imgHeight: 1,
+    imgWidth: 1,
+    imgNaturalHeight: 1,
+    imgNaturalWidth: 1,
     editMode: false,
   };
 
@@ -20,23 +23,40 @@ class Cameras extends React.Component {
     const img = document.querySelector("div>img");
     this.setState({
       imgHeight: img.height,
-      imgWidth: img.width
-    })
+      imgWidth: img.width,
+      imgNaturalHeight: img.naturalHeight,
+      imgNaturalWidth: img.naturalWidth,
+    });
+  }
+
+  handleSave() {
+    const areas = this.camToolNode.current.state.rectangles.map((rect) => {
+      return {
+        room_id: 1,
+        position_x: rect.x,
+        position_y: rect.y,
+        width: rect.width,
+        height: rect.height
+      }
+    });
+    axios.post('http://localhost:4000/forbidden_areas', areas)
   }
 
   render() {
-    const initialRectangles = [
-      {
-        x: 50,
-        y: 50,
-        width: 100,
-        height: 100,
+    let cpt = 0;
+    const initialRectangles = this.props.forbiddenAreas.map((area) => {
+      cpt++;
+      return {
+        id: cpt,
+        x: area.position_x * this.state.imgWidth / this.state.imgNaturalWidth,
+        y: area.position_y * this.state.imgHeight / this.state.imgNaturalHeight,
+        width: area.width * this.state.imgWidth / this.state.imgNaturalWidth,
+        height: area.height * this.state.imgHeight / this.state.imgNaturalHeight,
         stroke: '#f00',
         strokeWidth: 4,
-        id: 1,
         draggable: this.state.editMode
       }
-    ];
+    });
 
     return (
       <>
@@ -87,7 +107,8 @@ class Cameras extends React.Component {
                 onClick={() => {
                   this.setState({
                     editMode: !this.state.editMode
-                  })
+                  });
+                  this.state.editMode && this.handleSave();
                 }}
                 startIcon={this.state.editMode ? <Save /> : <Edit />}
                 size={"large"}
