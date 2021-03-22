@@ -19,7 +19,7 @@ Installation guide :
 
 ### Add Web App Build To Local Server
 Deployment guilde :
-- On GITHUB website, choice your build version on branches (e.j build-v1)
+- On Github website, choice your build version on branches (e.j build-v1)
 - Get the link and clone it on your "/www" local repository
 
 > Optional : if you want to make your own build, [check it out](#web-app-environment)
@@ -27,8 +27,9 @@ Deployment guilde :
 ## Development Setup
 
 1. Install Web App Environment
-2. Install Python Environment
-3. Setup your GPU (optional)
+2. Create your local database
+3. Install Python Environment
+4. Setup your GPU (optional)
 
 ### Web App Environment
 Install NodeJS and NPM 
