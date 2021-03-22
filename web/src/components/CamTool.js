@@ -92,54 +92,94 @@ const Rectangle = ({ shapeProps, isSelected, onSelect, onChange, canvasSize, edi
   );
 };
 
-const CamTool = (props) => {
-  const { width, height, editMode, initialRectangles } = props;
-  const [rectangles, setRectangles] = React.useState(initialRectangles);
-  const [selectedId, selectShape] = React.useState(null);
+class CamTool extends React.Component {
+  state = {
+    rectangles: this.props.initialRectangles,
+    selectedId: null,
+    countRectangles: 1
+  };
 
-  const checkDeselect = (e) => {
+  checkDeselect = (e) => {
     // deselect when clicked on empty area
     const clickedOnEmpty = e.target === e.target.getStage();
     if (clickedOnEmpty) {
-      selectShape(null);
+      this.setState({
+        selectedId: null
+      });
     }
   };
+  
+  addRectangle = () => {
+    this.state.rectangles.push({
+      x: 50,
+      y: 50,
+      width: 100,
+      height: 100,
+      stroke: '#f00',
+      strokeWidth: 4,
+      id: this.state.countRectangles + 1,
+      draggable: this.props.editMode
+    });
+    this.setState({
+      countRectangles: this.state.countRectangles + 1,
+      selectedId: this.state.countRectangles + 1
+    });
+    this.forceUpdate();
+  };
 
-  return (
-    <>
-      <Stage
-        width={width}
-        height={height}
-        onMouseDown={checkDeselect}
-        onTouchStart={checkDeselect}
-      >
-        <Layer>
-          {rectangles.map((rect, i) => {
-            return (
-              <Rectangle
-                key={i}
-                shapeProps={rect}
-                isSelected={rect.id === selectedId}
-                onSelect={() => {
-                  selectShape(rect.id);
-                }}
-                onChange={(newAttrs) => {
-                  const rects = rectangles.slice();
-                  rects[i] = newAttrs;
-                  setRectangles(rects);
-                }}
-                canvasSize={{
-                  width: width,
-                  height: height
-                }}
-                editMode={editMode}
-              />
-            );
-          })}
-        </Layer>
-      </Stage>
-    </>
-  );
+  deleteRectangle = () => {
+    for (let i = 0; i < this.state.rectangles.length; i++) {
+      if (this.state.rectangles[i].id === this.state.selectedId) {
+        this.state.rectangles.splice(i, 1);
+        break;
+      }
+    }
+    this.forceUpdate();
+  }
+
+  render () {
+    const { width, height, editMode } = this.props;
+    console.log(this.state.rectangles)
+    return (
+      <>
+        <Stage
+          width={width}
+          height={height}
+          onMouseDown={this.checkDeselect}
+          onTouchStart={this.checkDeselect}
+        >
+          <Layer>
+            {this.state.rectangles.map((rect, i) => {
+              return (
+                <Rectangle
+                  key={i}
+                  shapeProps={rect}
+                  isSelected={rect.id === this.state.selectedId}
+                  onSelect={() => {
+                    this.setState({
+                      selectedId: rect.id
+                    });
+                  }}
+                  onChange={(newAttrs) => {
+                    const rects = this.state.rectangles.slice();
+                    rects[i] = newAttrs;
+                    this.setState({
+                      rectangles: rects
+                    });
+                  }}
+                  canvasSize={{
+                    width: width,
+                    height: height
+                  }}
+                  editMode={editMode}
+                />
+              );
+            })}
+          </Layer>
+        </Stage>
+      </>
+    );
+  }
 }
 
 export default CamTool;
