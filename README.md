@@ -6,7 +6,7 @@
 2. Add React Build to Local Server
 
 ### Setup Local Server (Wamp Server on Windows 10)
-> Version : 3.2.3
+> https://sourceforge.net/projects/wampserver/files/WampServer%203/WampServer%203.0.0/ - Version : 3.2.3
 
 Installation guide :
 - Choose your language
@@ -26,9 +26,9 @@ Deployment guilde :
 
 ## Development Setup
 
-1- Install Web App Environment
-2- Install Python Environment
-3- Setup your GPU (optional)
+1. Install Web App Environment
+2. Install Python Environment
+3. Setup your GPU (optional)
 
 ### Web App Environment
 Install NodeJS and NPM 
@@ -63,6 +63,31 @@ npm start
 ```
 npm run build
 ```
+
+### Database (with PhpMyAdmin)
+Install [WampServer v3.2.3](#setup-local-server-wamp-server-on-windows-10)
+
+Go to "PhpMyAdmin" interface with this URL : http://localhost/phpmyadmin/ (default path)
+
+Connect to the website with your logs !
+> default username : root
+> default password : (none)
+
+If you don't have an already existing database, please create one and name it :
+```
+2z2tz_patcam_test 
+```
+
+Otherwise, delete it and create it again with the exaclty same name !
+
+After these steps, click on "Import" button.
+
+Put the file "2z2tz_patcam_test.sql". You should find it here :
+```
+repository_git : database/HERE
+```
+
+Then "Execute" and your database is ready to be used.
 
 ### Python
 using python 3.8
