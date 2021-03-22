@@ -67,7 +67,6 @@ def remove_similar_centers(classDetected):
                 to_merge.add(points[i])
                 to_merge.add(points[i + 1])
                 i += 1
-                print("test")
             if len(indexes) > 0:
                 for i in range(len(indexes)):
                     del classDetected[detected][0]
@@ -126,7 +125,7 @@ def tracked_object(new_center, detectedObjects):
 
 
 class Detection(Thread):
-    def __init__(self, queue, camera, detection_result, displayed=DISPLAYED, display=False):
+    def __init__(self, queue, camera, detection_result, displayed=None, forbidden_areas=None, display=False):
         """
         Initialise un flux video ou la detection sera fait
         :param capture: feed to read on
@@ -134,6 +133,9 @@ class Detection(Thread):
         :param display: afficher un visuel opencv de la camera (debug)
         """
         super().__init__()
+        if displayed is None:
+            displayed = DISPLAYED
+        self.forbidden_areas = forbidden_areas
         self.queue = queue
         self.cam = camera
         self.result = detection_result
@@ -223,6 +225,10 @@ class Detection(Thread):
                         color = (255, 0, 0)  # Bleu si l'objet est deja connu
                     else:
                         color = (0, 255, 0)  # Vert so c'est un nouvel objet
+
+                    if is_in_area(box, self.forbidden_areas):
+                        # TODO: Electrocuter le chien :)
+                        pass
                     # Ajout du nouvel element detecté dans la liste
                     temp_detected.append((className, (new_center, time.time())))
 

@@ -18,11 +18,12 @@ if __name__ == '__main__':
     queues = list()
     for room_id in room_ids:
         queue = Queue()
-        p = Process(target=Camera, args=(queue, room_id[0], room_id[0], (1280, 720), True))
+        camera_ip = db.getCameraWithID(room_id[2])
+        p = Process(target=Camera, args=(queue, camera_ip, room_id[0], (1280, 720), True))
         p.start()
         queues.append(queue)
         cams.append(p)
-    time.sleep(10)
+    time.sleep(1000)
     for i, cam in enumerate(cams):
         queues[i].put("stop")
         cam.join()

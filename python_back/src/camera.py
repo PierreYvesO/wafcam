@@ -40,7 +40,7 @@ class Camera:
         self.detection_queue = Queue()
         self.detection_result = Queue()
         self.detection = Detection(self.detection_queue, self, self.detection_result, self.db.getEntities(),
-                                   self.display)
+                                   self.db.getForbiddenAreas(), self.display)
         self.detection.start()
 
     def displayCamera(self):
