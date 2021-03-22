@@ -5,11 +5,13 @@ import cv2
 import numpy as np
 import math
 
-LIMITE_CONF = 0.6  # limite de confiance de detection
-LIMITE_CONF_NMS = 0.3  # limite de confiance pour l'algo NMS
-TRACKING_OFFSET = 80
+LIMITE_CONF = 0.3  # limite de confiance de detection
+LIMITE_CONF_NMS = .1  # limite de confiance pour l'algo NMS
+TRACKING_OFFSET = 100
 TIME_LIMIT = 2
 FRAME_TIMER = .2
+SIMILAR_THRESHOLD = 5
+DISPLAYED = ["cat", "dog"]
 
 
 def display_detected(img, detected):
@@ -42,8 +44,89 @@ def get_rect_center(x, y, w, h):
     return centerX, centerY
 
 
+def remove_similar_centers(classDetected):
+    """
+    Detecte les elements similaires d'une classe et les fusionne
+    :param classDetected: dictionnaire classname : elmts
+    """
+    for detected in classDetected:
+        points = [elmt[0] for elmt in classDetected[detected]]
+        points.sort()
+
+        i = 0
+        j = 0
+        while j < len(points) - 1:
+            points = [elmt[0] for elmt in classDetected[detected]]
+            points.sort()
+            indexes = set()
+            i = j
+            to_merge = set()
+            while i < len(points) - 1 and similar_point(points[i], points[i + 1]):
+                indexes.add(i)
+                indexes.add(i + 1)
+                to_merge.add(points[i])
+                to_merge.add(points[i + 1])
+                i += 1
+                print("test")
+            if len(indexes) > 0:
+                for i in range(len(indexes)):
+                    del classDetected[detected][0]
+
+                average = [round(sum(x) / len(x)) for x in zip(*to_merge)]
+                classDetected[detected].append((tuple(average), time.time()))
+                classDetected[detected].sort()
+                j = 0
+            else:
+                j += 1
+
+
+def similar_point(p1, p2):
+    return abs(p1[0] - p2[0]) <= SIMILAR_THRESHOLD and abs(p1[1] - p2[1]) <= SIMILAR_THRESHOLD
+
+
+def is_in_area(objectBox, forbiddenBoxes):
+    totalArea = 0
+    for forbiddenBox in forbiddenBoxes:
+        totalArea += intersection_area(objectBox, forbiddenBox)
+    objectArea = objectBox[2] * objectBox[3]
+    if totalArea > objectArea or objectArea / totalArea > .25:
+        return True
+    else:
+        return False
+
+
+def intersection_area(boxA, boxB):
+    xA, yA, wA, hA = boxA
+    xB, yB, wB, hB = boxB
+    x1 = max(min(xA, xA + wA), min(xB, xB + wB))
+    y1 = max(min(yA, yA + hA), min(yB, yB + hB))
+    x2 = min(max(xA, xA + wA), max(xB, xB + wB))
+    y2 = min(max(yA, yA + hA), max(yB, yB + hB))
+
+    return (x2 - x1) * (y2 - y1) if x1 < x2 and y1 < y2 else 0
+
+
+def tracked_object(new_center, detectedObjects):
+    """
+    Recupere le potentiel objet detecté precedemment qui correspond à l'objet detecté actuellement.
+    Cela permet de suivre un objet sans l'identifier comme nouveau
+    :param new_center: centre de l'objet nouvelement detecté
+    :param detectedObjects: liste des objets de la meme className dans el buffer d'objet detecté
+    :return: index de l'objet correspondant dans le buffer et distance entre les 2 centres
+    """
+    minIndex = -1
+    minDist = 99999
+    for i in range(0, len(detectedObjects)):
+        dist = math.dist(new_center, detectedObjects[i][0])
+        if dist < minDist:
+            minDist = dist
+            minIndex = i
+
+    return minIndex, minDist
+
+
 class Detection(Thread):
-    def __init__(self, queue, camera, detection_result, display=False):
+    def __init__(self, queue, camera, detection_result, displayed=DISPLAYED, display=False):
         """
         Initialise un flux video ou la detection sera fait
         :param capture: feed to read on
@@ -54,6 +137,10 @@ class Detection(Thread):
         self.queue = queue
         self.cam = camera
         self.result = detection_result
+        self.displayed = displayed
+        self.displayMap = {}
+        for elmt in displayed:
+            self.displayMap[elmt[1]] = elmt[0]
 
         # Lecture de la liste des objets detetable
         self.classNames: list
@@ -73,8 +160,9 @@ class Detection(Thread):
         self.net.setInputSwapRB(True)  # opencv utilise un mode BGR donc il faut inverser le R et B
 
         self.display = display
-
-        self.lastInfos = (0, 0)
+        self.lastInfos = []
+        for animal in self.displayMap:
+            self.lastInfos.append(0)
 
     def startProcess(self):
         self.run()
@@ -117,7 +205,8 @@ class Detection(Thread):
                     i = idx[0]
                     box = bbox[i]
                     className = self.classNames[classIds[i][0] - 1]
-
+                    if className not in self.displayMap:
+                        break
                     if className not in classDetected:
                         classDetected[className] = list()
 
@@ -125,9 +214,9 @@ class Detection(Thread):
                     # isNew est marqué False et l'objet est supprimé de la liste
                     # la verification se fait par position des 4 coins
                     new_center = get_rect_center(box[0], box[1], box[2], box[3])
-                    objectIndice, objectDist = self.tracked_object(new_center, classDetected[className])
+                    objectIndice, objectDist = tracked_object(new_center, classDetected[className])
 
-                    if objectDist < TRACKING_OFFSET and objectIndice != 1:
+                    if objectDist < TRACKING_OFFSET and objectIndice != -1 and len(classDetected[className]) > 0:
                         del classDetected[className][objectIndice]
                         isNew = False
                     if not isNew:
@@ -152,7 +241,7 @@ class Detection(Thread):
                             classDetected[className].remove(detect)
                             if len(classDetected[className]) == 0:
                                 toDelete.append(className)
-                self.remove_similar_centers(classDetected)
+                remove_similar_centers(classDetected)
                 for className in toDelete:
                     del classDetected[className]
             # pour debug
@@ -161,8 +250,8 @@ class Detection(Thread):
                 display_detected(img, detected)
 
                 # Affichage console des objets presents dans la scene
-                for detect in classDetected:
-                    print(detect, ":", len(classDetected[detect]))
+                # for detect in classDetected:
+                #     print(detect, ":", len(classDetected[detect]))
 
                 # Affiche l'image sur ecran
                 cv2.imshow("Output", img)
@@ -175,71 +264,39 @@ class Detection(Thread):
         Dtecte si des nouveaux chats/chiens ont été detectés ou ont disparu et stocke le compteur chat/chien
         :param classDetected:
         """
-        if "dog" in classDetected:
-            dogs = len(classDetected["dog"])
-        else:
-            dogs = 0
-        if "cat" in classDetected:
-            cats = len(classDetected["cat"])
-        else:
-            cats = 0
+        animals = list()
+        for i, animal in enumerate(self.displayMap):
+            if animal in classDetected:
+                animals.append(len(classDetected[animal]))
+            else:
+                animals.append(0)
         output = ""
-        if self.lastInfos[0] < dogs:
-            output += "dog in\n"
-        if self.lastInfos[0] > dogs:
-            output += "dog out\n"
-        if self.lastInfos[1] < cats:
-            output += "cat in\n"
-        if self.lastInfos[1] > cats:
-            output += "cat out\n"
+
+        for i, animal in enumerate(animals):
+            if self.lastInfos[i] < animals[i]:
+                output += "{0} in\n".format(list(self.displayMap.keys())[i])
+            if self.lastInfos[i] > animals[i]:
+                output += "{0} out\n".format(list(self.displayMap.keys())[i])
         if len(output) > 0:
-            self.lastInfos = (dogs, cats)
+            for i, nb in enumerate(animals):
+                self.lastInfos[i] = nb
             print(output)
             # Envoie les infos vers la camera
             with self.result.mutex:
                 self.result.queue.clear()
-            animalDict = {"dog": self.lastInfos[0], "cat": self.lastInfos[1]}
+
+            animalDict = {}
+            for i, animal in enumerate(self.displayMap):
+                animalDict[str(self.displayMap[animal])] = self.lastInfos[i]
             self.result.put(animalDict)
 
-    def tracked_object(self, new_center, detectedObjects):
-        """
-        Recupere le potentiel objet detecté precedemment qui correspond à l'objet detecté actuellement.
-        Cela permet de suivre un objet sans l'identifier comme nouveau
-        :param new_center: centre de l'objet nouvelement detecté
-        :param detectedObjects: liste des objets de la meme className dans el buffer d'objet detecté
-        :return: index de l'objet correspondant dans le buffer et distance entre les 2 centres
-        """
-        minIndex = -1
-        minDist = 99999
-        for i in range(0, len(detectedObjects)):
-            dist = math.dist(new_center, detectedObjects[i][0])
-            if dist < minDist:
-                minDist = dist
-                minIndex = i
 
-        return minIndex, minDist
-
-    def remove_similar_centers(self, classDetected):
-        """
-        Detecte les elements similaires d'une classe et les fusionne
-        :param classDetected: dictionnaire classname : elmts
-        """
-        for detected in classDetected:
-            points = [elmt[0] for elmt in classDetected[detected]]
-            md = 20  # max distance allowed between two points
-            points.sort()
-            to_remove = set()  # keep track of items to be removed
-
-            for i, point in enumerate(points):
-                if i == len(points) - 1:
-                    break
-                other_point = points[i + 1]
-                if abs(point[0] - other_point[0]) <= md and abs(point[1] - other_point[1]) <= md:
-                    to_remove.add(i)
-
-            for point in to_remove:
-                try:
-                    del classDetected[detected][point]
-                except:
-                    print(point, classDetected[detected])
-
+if __name__ == '__main__':
+    print(intersection_area([0, 0, 20, 20], [15, 15, 10, 10]))
+    rep = is_in_area([3, 3, 13, 13], [[0, 0, 20, 20], [15, 15, 10, 10]])
+    print(rep)
+    # test = {"a": [((0, 1), 5), ((0, 2), 3), ((30, 50), 1), ((1, 3), 5), ((0, 4), 8)]}
+    # test['a'].sort()
+    # print(test)
+    # remove_similar_centers(test)
+    # print(test)

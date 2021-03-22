@@ -1,5 +1,5 @@
 import { MenuItem, MenuList, Paper } from '@material-ui/core';
-import { Videocam, Home } from '@material-ui/icons';
+import { Videocam, Home, Toc } from '@material-ui/icons';
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 
@@ -17,6 +17,12 @@ const Navigation = () => {
           <MenuItem>
             <Videocam />
             Caméras
+          </MenuItem>
+        </NavLink>
+        <NavLink exact to="rooms">
+          <MenuItem>
+            <Toc />
+            Pièces
           </MenuItem>
         </NavLink>
       </MenuList>
