@@ -2,11 +2,12 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mysql = require('mysql');
 const cors = require('cors');
+const http = require('http');
 
 const connection = mysql.createPool({
-  host     : 'localhost',
-  user     : 'root',
-  password : '',
+  host     : '92.89.142.198',
+  user     : 'patcam_user',
+  password : 'PaTcAm78',
   database : '2z2tz_patcam_test'
 });
 
@@ -64,20 +65,36 @@ app.get('/forbidden_areas', function (req, res) {
 app.post('/forbidden_areas', function (req, res) {
   // Connecting to the database.
   connection.getConnection(function (err, connection) {
-    const values = req.body.map((area) => {
+    const valuesToInsert = req.body.filter(area => typeof area.id === "string").map((area) => {
+      delete area.id;
       return Object.values(area);
-    })
-    connection.query(
-      'INSERT INTO forbidden_area (room_id, position_x, position_y, width, height) VALUES ?',
-      [values],
-      function (error, results, fields) {
-        // If some error occurs, we throw an error.
-        if (error) throw error;
-
-        // Getting the 'response' from the database and sending it to our route. This is were the data is.
-        res.send(results)
-      }
-    );
+    });
+    const valuesToUpdate = req.body.filter(area => area.id !== undefined).map((area) => {
+      return Object.values(area);
+    });
+    console.log(valuesToUpdate);
+    if (valuesToInsert.length > 0) {
+      connection.query(
+        'INSERT INTO forbidden_area (room_id, position_x, position_y, width, height) VALUES ?',
+        [valuesToInsert],
+        function (error, results, fields) {
+          // If some error occurs, we throw an error.
+          if (error) throw error;
+        }
+      );
+    }
+    if (valuesToUpdate.length > 0) {
+      valuesToUpdate.map((area) => {
+        connection.query(
+          'UPDATE forbidden_area SET room_id = ?, position_x = ?, position_y = ?, width = ?, height = ? WHERE id = ?',
+          area,
+          function (error, results, fields) {
+            // If some error occurs, we throw an error.
+            if (error) throw error;
+          }
+        );
+      })
+    }
   });
 });
 

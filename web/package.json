@@ -29,7 +29,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "api": "node ./src/routes.js",
+    "all": "npm-run-all --parallel start api"
   },
   "eslintConfig": {
     "extends": [

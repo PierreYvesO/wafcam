@@ -96,7 +96,7 @@ class CamTool extends React.Component {
   state = {
     rectangles: this.props.initialRectangles,
     selectedId: null,
-    countRectangles: 1
+    countNewRectangles: 0
   };
 
   checkDeselect = (e) => {
@@ -117,12 +117,12 @@ class CamTool extends React.Component {
       height: 100,
       stroke: '#f00',
       strokeWidth: 4,
-      id: this.state.countRectangles + 1,
+      id: "new" + (this.state.countNewRectangles + 1),
       draggable: this.props.editMode
     });
     this.setState({
-      countRectangles: this.state.countRectangles + 1,
-      selectedId: this.state.countRectangles + 1
+      countNewRectangles: this.state.countNewRectangles + 1,
+      selectedId: "new" + (this.state.countNewRectangles + 1)
     });
     this.forceUpdate();
   };
