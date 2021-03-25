@@ -33,21 +33,20 @@ class Cameras extends React.Component {
     const areas = this.camToolNode.current.state.rectangles.map((rect) => {
       return {
         room_id: 1,
-        position_x: rect.x,
-        position_y: rect.y,
-        width: rect.width,
-        height: rect.height
+        position_x: Math.round(rect.x),
+        position_y: Math.round(rect.y),
+        width: Math.round(rect.width),
+        height: Math.round(rect.height),
+        id: rect.id
       }
     });
     axios.post('http://localhost:4000/forbidden_areas', areas)
   }
 
   render() {
-    let cpt = 0;
     const initialRectangles = this.props.forbiddenAreas.map((area) => {
-      cpt++;
       return {
-        id: cpt,
+        id: area.id,
         x: area.position_x * this.state.imgWidth / this.state.imgNaturalWidth,
         y: area.position_y * this.state.imgHeight / this.state.imgNaturalHeight,
         width: area.width * this.state.imgWidth / this.state.imgNaturalWidth,
@@ -64,7 +63,7 @@ class Cameras extends React.Component {
         <div className="Content">
           <h1>Caméras</h1>
           <div className="camTool">
-            <img src="./img/cam1.png" alt="caméra doguito" onLoad={this.handleImageLoaded.bind(this)} />
+            <img src="http://81.83.10.9:8001/mjpg/video.mjpg" alt="caméra doguito" onLoad={this.handleImageLoaded.bind(this)} />
             <CamTool
               width={this.state.imgWidth}
               height={this.state.imgHeight}
