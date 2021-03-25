@@ -30,5 +30,5 @@ class DetectionUtilsTest(unittest.TestCase):
         base_rect = [0, 0, 20, 20]
         forbiddens = [15, 15, 10, 10]
         self.assertTrue(det.is_in_area(base_rect, forbiddens))
-        rep = is_in_area([3, 3, 13, 13], [[0, 0, 20, 20], [15, 15, 10, 10]])
-        print(rep)
+        # rep = is_in_area([3, 3, 13, 13], [[0, 0, 20, 20], [15, 15, 10, 10]])
+        # print(rep)
