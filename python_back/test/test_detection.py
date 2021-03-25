@@ -25,10 +25,21 @@ class DetectionUtilsTest(unittest.TestCase):
             pt_res = [elmt[0] for elmt in test_material[dict_value]]
             for pt in pt_exp:
                 self.assertTrue(pt in pt_res)
-    def is_in_area(self):
+
+    def test_is_in_area(self):
         # simple test case
         base_rect = [0, 0, 20, 20]
-        forbiddens = [15, 15, 10, 10]
+        forbiddens = [[10, 10, 20, 20]]
         self.assertTrue(det.is_in_area(base_rect, forbiddens))
-        # rep = is_in_area([3, 3, 13, 13], [[0, 0, 20, 20], [15, 15, 10, 10]])
-        # print(rep)
+        base_rect = [0, 0, 20, 20]
+        forbiddens = [[20, 20, 10, 10]]
+        self.assertFalse(det.is_in_area(base_rect, forbiddens))
+
+        # 1 forbidden area is fully covered
+        forbiddens = [[0, 0, 5, 5]]
+        self.assertTrue(det.is_in_area(base_rect, forbiddens))
+
+        # more than 1 forbidden space = 15% intersection each should be true
+        forbiddens = [[10, 14, 20, 20], [14, 10, 20, 20]]
+        self.assertTrue(det.is_in_area(base_rect, forbiddens))
+

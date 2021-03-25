@@ -12,6 +12,7 @@ TRACKING_OFFSET = 100
 TIME_LIMIT = 2
 FRAME_TIMER = .2
 SIMILAR_THRESHOLD = 5
+INTER_THRESHOLD = .25
 DISPLAYED = ["cat", "dog"]
 
 
@@ -88,11 +89,19 @@ def similar_point(p1, p2):
 
 
 def is_in_area(objectBox, forbiddenBoxes):
+    """
+    Test qu'un element est forme une intersection de plus de INTER_THRESHOLD % avec toutes les zones données
+    Une zone interdite qui est comprise dans le rectangle objectBox renvoi True directement
+    Si plusieurs zones données se chevauchent l'intersection contera double
+    @param objectBox: rectangle a tester
+    @param forbiddenBoxes: zones données
+    @return: True si l'aire du rectangel a tester et couvert a plus de INTER_THRESHOLD %
+    """
     totalArea = 0
     for forbiddenBox in forbiddenBoxes:
         totalArea += intersection_area(objectBox, forbiddenBox)
     objectArea = objectBox[2] * objectBox[3]
-    if totalArea > objectArea or objectArea / totalArea > .25:
+    if totalArea > 0 and (totalArea > objectArea or totalArea / objectArea >= INTER_THRESHOLD):
         return True
     else:
         return False
@@ -101,6 +110,8 @@ def is_in_area(objectBox, forbiddenBoxes):
 def intersection_area(boxA, boxB):
     xA, yA, wA, hA = boxA
     xB, yB, wB, hB = boxB
+    if xA <= xB and yA >= yB and wA >= wB and yA >= yB:
+        return wA * hA
     x1 = max(min(xA, xA + wA), min(xB, xB + wB))
     y1 = max(min(yA, yA + hA), min(yB, yB + hB))
     x2 = min(max(xA, xA + wA), max(xB, xB + wB))
@@ -243,7 +254,6 @@ class Detection(Thread):
                     detected.append((box, className, confs[i] * 100, color))
                 for elmt in temp_detected:
                     classDetected[elmt[0]].append(elmt[1])
-
 
                 # Dans le cas de faux positifs, la detection est en general tres succinte, pour palier a ce probleme et
                 # eviter que ces erreurs de detection influe sur les resultats de la detection, on supprime les objets
