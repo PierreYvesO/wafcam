@@ -4,6 +4,7 @@ from threading import Thread
 import cv2
 import numpy as np
 import math
+from operator import itemgetter
 
 LIMITE_CONF = 0.3  # limite de confiance de detection
 LIMITE_CONF_NMS = .1  # limite de confiance pour l'algo NMS
@@ -50,8 +51,11 @@ def remove_similar_centers(classDetected):
     :param classDetected: dictionnaire classname : elmts
     """
     for detected in classDetected:
+        # list.sort() compare uniquement le 1er element d'une liste pour trier.
+        # On peut donc utiliser pour trier seuelement par la position en ignorant le 2eme element.
+        classDetected[detected].sort()
         points = [elmt[0] for elmt in classDetected[detected]]
-        points.sort()
+        # points.sort()
 
         i = 0
         j = 0
@@ -127,10 +131,13 @@ def tracked_object(new_center, detectedObjects):
 class Detection(Thread):
     def __init__(self, queue, camera, detection_result, displayed=None, forbidden_areas=None, display=False):
         """
-        Initialise un flux video ou la detection sera fait
-        :param capture: feed to read on
-        :param size: taille de l'image rentrante
-        :param display: afficher un visuel opencv de la camera (debug)
+        Lance un Tread de detection sur un flux video donné.
+        @param queue: queue de communication start/stop entre l'objet camera et detection
+        @param camera: fluc video donnée
+        @param detection_result: queue de communication retournant les resultats de la detection
+        @param displayed: liste des object a detecter
+        @param forbidden_areas: liste des zones rectangle ou la detection d'un objet de la list displayed doit rencoyé une information
+        @param display: (DEBUG) affichage de la detection en temps reel
         """
         super().__init__()
         if displayed is None:
@@ -236,6 +243,7 @@ class Detection(Thread):
                     detected.append((box, className, confs[i] * 100, color))
                 for elmt in temp_detected:
                     classDetected[elmt[0]].append(elmt[1])
+
 
                 # Dans le cas de faux positifs, la detection est en general tres succinte, pour palier a ce probleme et
                 # eviter que ces erreurs de detection influe sur les resultats de la detection, on supprime les objets
