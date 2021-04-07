@@ -1,11 +1,11 @@
 import mysql.connector
 from python_back.src.database_utils import config as prod_config
 
-LOG_TABLE = ("room_entities", "room_id", "entity_id", "amount_entities", "time_record")
-ENTITY_TABLE = ("entity", "*")
-ROOM_TABLE = ("room", "*")
-FORBIDDEN_TABLE = ("forbidden_area", "*")
-CAMERA_TABLE = ("camera", "ip")
+LOG_TABLE = ("log", "id_camera", "id_animal", "number", "timestamp")
+ENTITY_TABLE = ("animal", "*")
+ROOM_TABLE = ("room", "id_room")
+FORBIDDEN_TABLE = ("area", "*")
+CAMERA_TABLE = ("camera", "ip_adress", "user", "password")
 
 
 class Database:
@@ -18,7 +18,6 @@ class Database:
 
     def closeConnection(self):
         self.wait_available()
-        self.processing = True
         self.db.close()
 
     def addLog(self, animal, number, camera_id, timestamp):
@@ -45,19 +44,19 @@ class Database:
         return res
 
     def getEntities(self):
-        return self.buildSelect(*ENTITY_TABLE)
+        return self.buildSelect(ENTITY_TABLE)
 
     def getRooms(self):
-        return self.buildSelect(*ROOM_TABLE)
+        return self.buildSelect(ROOM_TABLE)
 
     def getForbiddenAreas(self):
-        return self.buildSelect(*FORBIDDEN_TABLE)
+        return self.buildSelect(FORBIDDEN_TABLE)
 
-    def getCameraWithID(self, id_camera: int):
+    def getCameraFromRoomWithID(self, id_room: int):
         self.wait_available()
         self.processing = True
         cursor = self.db.cursor(prepared=True)
-        cursor.execute("SELECT {1} FROM {0} WHERE id={2}".format(*CAMERA_TABLE), id)
+        cursor.execute("SELECT `{1}`,`{2}`,`{3}` FROM {0} WHERE id_room={4}".format(*CAMERA_TABLE, id_room))
         res = cursor.fetchall()
         cursor.close()
         self.processing = False

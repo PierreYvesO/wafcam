@@ -22,9 +22,10 @@ def read_env():
         tmp = x.split(":")
         db_dict[tmp[0].strip()] = tmp[1].strip()
     f.close()
+    del db_dict['driver']
     db_dict['raise_on_warnings'] = True
     return db_dict
 
 
 if __name__ == '__main__':
-    read_env()
+    print(read_env())

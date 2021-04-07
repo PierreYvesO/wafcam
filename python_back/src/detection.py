@@ -4,7 +4,6 @@ from threading import Thread
 import cv2
 import numpy as np
 import math
-from operator import itemgetter
 
 LIMITE_CONF = 0.3  # limite de confiance de detection
 LIMITE_CONF_NMS = .1  # limite de confiance pour l'algo NMS
@@ -58,7 +57,6 @@ def remove_similar_centers(classDetected):
         points = [elmt[0] for elmt in classDetected[detected]]
         # points.sort()
 
-        i = 0
         j = 0
         while j < len(points) - 1:
             points = [elmt[0] for elmt in classDetected[detected]]
@@ -140,23 +138,27 @@ def tracked_object(new_center, detectedObjects):
 
 
 class Detection(Thread):
-    def __init__(self, queue, camera, detection_result, displayed=None, forbidden_areas=None, display=False):
+    def __init__(self, camera, state_queue, detection_result_queue, forbidden_area_queue, displayed=None, forbidden_areas=None, display=False):
         """
         Lance un Tread de detection sur un flux video donné.
-        @param queue: queue de communication start/stop entre l'objet camera et detection
-        @param camera: fluc video donnée
-        @param detection_result: queue de communication retournant les resultats de la detection
+        @param state_queue: queue de communication start/stop entre l'objet camera et detection
+        @param camera: flux video donnée
+        @param detection_result_queue: queue de communication retournant les resultats de la detection
         @param displayed: liste des object a detecter
-        @param forbidden_areas: liste des zones rectangle ou la detection d'un objet de la list displayed doit rencoyé une information
+        @param forbidden_areas: liste des zones rectangle ou la detection d'un objet de la list displayed doit rencoyer
+                                une information
         @param display: (DEBUG) affichage de la detection en temps reel
         """
         super().__init__()
+        if forbidden_areas is None:
+            forbidden_areas = list()
         if displayed is None:
             displayed = DISPLAYED
         self.forbidden_areas = forbidden_areas
-        self.queue = queue
+        self.queue = state_queue
+        self.forbidden_areas_queue = forbidden_area_queue
         self.cam = camera
-        self.result = detection_result
+        self.result = detection_result_queue
         self.displayed = displayed
         self.displayMap = {}
         for elmt in displayed:
@@ -181,7 +183,7 @@ class Detection(Thread):
 
         self.display = display
         self.lastInfos = []
-        for animal in self.displayMap:
+        for _ in self.displayMap:
             self.lastInfos.append(0)
 
     def startProcess(self):
@@ -245,6 +247,9 @@ class Detection(Thread):
                         color = (0, 255, 0)  # Vert so c'est un nouvel objet
 
                     if is_in_area(box, self.forbidden_areas):
+                        #envoi log pour la BDD
+                        self.forbidden_areas_queue.put(0)
+                        # execute l'action
                         # TODO: Electrocuter le chien :)
                         pass
                     # Ajout du nouvel element detecté dans la liste
@@ -272,12 +277,6 @@ class Detection(Thread):
             if self.display:
                 # Affiche les rectangles
                 display_detected(img, detected)
-
-                # Affichage console des objets presents dans la scene
-                # for detect in classDetected:
-                #     print(detect, ":", len(classDetected[detect]))
-
-                # Affiche l'image sur ecran
                 cv2.imshow("Output", img)
                 cv2.waitKey(1)
 
@@ -313,14 +312,3 @@ class Detection(Thread):
             for i, animal in enumerate(self.displayMap):
                 animalDict[str(self.displayMap[animal])] = self.lastInfos[i]
             self.result.put(animalDict)
-
-
-if __name__ == '__main__':
-    print(intersection_area([0, 0, 20, 20], [15, 15, 10, 10]))
-    rep = is_in_area([3, 3, 13, 13], [[0, 0, 20, 20], [15, 15, 10, 10]])
-    print(rep)
-    # test = {"a": [((0, 1), 5), ((0, 2), 3), ((30, 50), 1), ((1, 3), 5), ((0, 4), 8)]}
-    # test['a'].sort()
-    # print(test)
-    # remove_similar_centers(test)
-    # print(test)
