@@ -29,10 +29,9 @@ def threaded(fn):
 
 
 class Camera:
-    def __init__(self, queue, ip, cam_id, size=tuple(), display=False):
+    def __init__(self, queue, ip, cam_id, size=tuple(), display=False , user='', pwd=''):
         self.cam_queue: mQueue = queue
-        # self.ip = ip
-        self.ip = 0
+        self.ip = self.parseURL(ip,user,pwd)
         self.display = display
         self.id = cam_id
         self.size = size
@@ -93,6 +92,13 @@ class Camera:
 
     def getID(self):
         return self.id
+
+    def parseURL(self, ip, user, pwd):
+        if ip.startswith('http://', 0, 6):
+            temp = ip[:6]
+        else:
+            temp = ip
+        return 'http://' + user + ':' + pwd + '@' + temp
 
     @threaded
     def save_infos(self):
