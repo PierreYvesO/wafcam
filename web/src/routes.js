@@ -5,9 +5,9 @@ const cors = require('cors');
 const http = require('http');
 
 const connection = mysql.createPool({
-  host     : '92.89.142.198',
-  user     : 'patcam_user',
-  password : 'PaTcAm78',
+  host     : 'localhost',
+  user     : 'root',
+  password : '',
   database : '2z2tz_patcam_test'
 });
 
@@ -23,11 +23,14 @@ app.get('/rooms', function (req, res) {
   connection.getConnection(function (err, connection) {
     // Executing the MySQL query (select all data from the 'room' table).
     connection.query('SELECT * FROM room', function (error, results, fields) {
+      // When done with the connection, release it.
+      connection.release();
+
       // If some error occurs, we throw an error.
       if (error) throw error;
 
       // Getting the 'response' from the database and sending it to our route. This is were the data is.
-      res.send(results)
+      res.send(results);
     });
   });
 });
@@ -38,11 +41,14 @@ app.get('/entities', function (req, res) {
   connection.getConnection(function (err, connection) {
     // Executing the MySQL query (select all data from the 'entity' table).
     connection.query('SELECT * FROM entity', function (error, results, fields) {
+      // When done with the connection, release it.
+      connection.release();
+
       // If some error occurs, we throw an error.
       if (error) throw error;
 
       // Getting the 'response' from the database and sending it to our route. This is were the data is.
-      res.send(results)
+      res.send(results);
     });
   });
 });
@@ -53,11 +59,14 @@ app.get('/forbidden_areas', function (req, res) {
   connection.getConnection(function (err, connection) {
     // Executing the MySQL query (select all data from the 'forbidden_area' table).
     connection.query('SELECT * FROM forbidden_area', function (error, results, fields) {
+      // When done with the connection, release it.
+      connection.release();
+
       // If some error occurs, we throw an error.
       if (error) throw error;
 
       // Getting the 'response' from the database and sending it to our route. This is were the data is.
-      res.send(results)
+      res.send(results);
     });
   });
 });
@@ -78,6 +87,9 @@ app.post('/forbidden_areas', function (req, res) {
         'INSERT INTO forbidden_area (room_id, position_x, position_y, width, height) VALUES ?',
         [valuesToInsert],
         function (error, results, fields) {
+          // When done with the connection, release it.
+          connection.release();
+
           // If some error occurs, we throw an error.
           if (error) throw error;
         }
@@ -89,6 +101,9 @@ app.post('/forbidden_areas', function (req, res) {
           'UPDATE forbidden_area SET room_id = ?, position_x = ?, position_y = ?, width = ?, height = ? WHERE id = ?',
           area,
           function (error, results, fields) {
+            // When done with the connection, release it.
+            connection.release();
+
             // If some error occurs, we throw an error.
             if (error) throw error;
           }
