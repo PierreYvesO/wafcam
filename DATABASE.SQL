@@ -30,7 +30,7 @@ SET time_zone = "+00:00";
 
 DROP TABLE IF EXISTS `animal`;
 CREATE TABLE IF NOT EXISTS `animal` (
-  `id_animal` int(11) NOT NULL,
+  `id_animal` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`id_animal`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -51,7 +51,7 @@ INSERT INTO `animal` (`id_animal`, `name`) VALUES
 
 DROP TABLE IF EXISTS `area`;
 CREATE TABLE IF NOT EXISTS `area` (
-  `id_area` int(11) NOT NULL,
+  `id_area` int(11) NOT NULL AUTO_INCREMENT,
   `id_camera` int(11) NOT NULL,
   `name` varchar(45) DEFAULT NULL,
   `x` int(11) NOT NULL,
@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS `area` (
 
 DROP TABLE IF EXISTS `camera`;
 CREATE TABLE IF NOT EXISTS `camera` (
-  `idcamera` int(11) NOT NULL,
+  `idcamera` int(11) NOT NULL AUTO_INCREMENT,
   `ip_adress` varchar(200) NOT NULL,
   `user` varchar(45) NOT NULL,
   `password` varchar(200) NOT NULL,
@@ -94,7 +94,7 @@ INSERT INTO `camera` (`idcamera`, `ip_adress`, `user`, `password`, `id_room`) VA
 
 DROP TABLE IF EXISTS `log`;
 CREATE TABLE IF NOT EXISTS `log` (
-  `id_log` int(11) NOT NULL,
+  `id_log` int(11) NOT NULL AUTO_INCREMENT,
   `id_camera` int(11) NOT NULL,
   `id_animal` int(11) NOT NULL,
   `id_area` int(11) DEFAULT NULL,
@@ -114,7 +114,7 @@ CREATE TABLE IF NOT EXISTS `log` (
 
 DROP TABLE IF EXISTS `room`;
 CREATE TABLE IF NOT EXISTS `room` (
-  `id_room` int(11) NOT NULL,
+  `id_room` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(45) NOT NULL,
   PRIMARY KEY (`id_room`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
