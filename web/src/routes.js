@@ -87,9 +87,6 @@ app.post('/forbidden_areas', function (req, res) {
         'INSERT INTO forbidden_area (room_id, position_x, position_y, width, height) VALUES ?',
         [valuesToInsert],
         function (error, results, fields) {
-          // When done with the connection, release it.
-          connection.release();
-
           // If some error occurs, we throw an error.
           if (error) throw error;
         }
@@ -101,15 +98,14 @@ app.post('/forbidden_areas', function (req, res) {
           'UPDATE forbidden_area SET room_id = ?, position_x = ?, position_y = ?, width = ?, height = ? WHERE id = ?',
           area,
           function (error, results, fields) {
-            // When done with the connection, release it.
-            connection.release();
-
             // If some error occurs, we throw an error.
             if (error) throw error;
           }
         );
       })
     }
+    // When done with the connection, release it.
+    connection.release();
   });
 });
 
