@@ -1,7 +1,7 @@
 import mysql.connector
 from python_back.src.database_utils import config as prod_config
 
-LOG_TABLE = ("log", "id_camera", "id_animal", "number", "timestamp")
+LOG_TABLE = ("log", "id_camera", "id_animal", "number", "id_area" , "timestamp")
 ENTITY_TABLE = ("animal", "*")
 ROOM_TABLE = ("room", "id_room")
 FORBIDDEN_TABLE = ("area", "*")
@@ -20,18 +20,24 @@ class Database:
         self.wait_available()
         self.db.close()
 
-    def addLog(self, animal, number, camera_id, timestamp):
+    def addLog(self, animal, number, camera_id, id_forbidden_area, timestamp):
         self.wait_available()
         self.processing = True
         cursor = self.db.cursor(prepared=True)
         sql_insert = "INSERT INTO  `{0}`" \
-                     "({1}, {2}, {3}, {4}) " \
-                     "VALUES (%s, %s, %s, %s)".format(*LOG_TABLE)
-        sql_data = (camera_id, animal, number, timestamp)
+                     "({1}, {2}, {3}, {4}, {5})" \
+                     "VALUES (%s, %s, %s, %s, %s)".format(*LOG_TABLE)
+        sql_data = (camera_id, animal, number, id_forbidden_area, timestamp)
         cursor.execute(sql_insert, sql_data)
         self.db.commit()
         cursor.close()
         self.processing = False
+
+    def addDetectedAnimalLog(self, animal, number, camera_id, timestamp):
+        self.addLog(animal, number, camera_id, None, timestamp)
+
+    def addDetectedInForbiddenAreaLog(self, animal, id_forbidden_area, camera_id, timestamp):
+        self.addLog(animal, None, camera_id, id_forbidden_area, timestamp)
 
     def buildSelect(self, table):
         self.wait_available()
@@ -61,7 +67,6 @@ class Database:
         cursor.close()
         self.processing = False
         return res
-
 
     def wait_available(self):
         while self.processing:

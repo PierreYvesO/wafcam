@@ -108,9 +108,9 @@ class Camera:
                 res = self.detection_result.get(timeout=5)
             except Empty:
                 # on garde la meme date pour tous les envois
-                time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 for animal in res:
-                    self.db.addLog(animal, res[animal], self.id, time)
+                    self.db.addDetectedAnimalLog(animal, res[animal], self.id, timestamp)
                 print("result_log_detected = " + str(res))
                 res = {}
         self.stop_all()
@@ -124,8 +124,9 @@ class Camera:
                 res = self.forbidden_access_queue.get(timeout=2)
             except Empty:
                 # on garde la meme date pour tous les envois
-                date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 for animal in res:
+                    self.db.addDetectedInForbiddenAreaLog(animal, 0, self.id, timestamp)
                     # TODO: Add insert for forbidden accesses db
                     pass
                 print("result_log_in_area = " + str(res))

@@ -5,8 +5,16 @@ from multiprocessing import Process, Queue
 from python_back.src.database_utils import read_env
 import time
 
+test_config = {
+    'user': 'waf',
+    'password': 'cam',
+    'host': '127.0.0.1',
+    'database': 'wafcam',
+    'raise_on_warnings': True
+}
+
 if __name__ == '__main__':
-    db = Database(read_env())
+    db = Database(test_config)
     # # cam = Camera("http://192.168.1.71:8080/stream.mjpeg", 1, size=(1280, 720), display=True)
     # # cam = Camera("rtsp://freja.hiof.no:1935/rtplive/definst/hessdalen03.stream", 1, size=(1280, 720), display=True)
     # # cam = Camera("http://wmccpinetop.axiscam.net/mjpg/video.mjpg", 1, size=(1280, 720), display=True)

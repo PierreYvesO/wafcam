@@ -86,7 +86,7 @@ def similar_point(p1, p2):
     return abs(p1[0] - p2[0]) <= SIMILAR_THRESHOLD and abs(p1[1] - p2[1]) <= SIMILAR_THRESHOLD
 
 
-def is_in_area(objectBox, forbiddenBoxes):
+def is_in_areas(objectBox, forbiddenAreas, triggeredAreas):
     """
     Test qu'un element est forme une intersection de plus de INTER_THRESHOLD % avec toutes les zones données
     Une zone interdite qui est comprise dans le rectangle objectBox renvoi True directement
@@ -96,8 +96,13 @@ def is_in_area(objectBox, forbiddenBoxes):
     @return: True si l'aire du rectangel a tester et couvert a plus de INTER_THRESHOLD %
     """
     totalArea = 0
-    for forbiddenBox in forbiddenBoxes:
-        totalArea += intersection_area(objectBox, forbiddenBox)
+    for forbiddenArea in forbiddenAreas:
+        forbiddenBox = forbiddenArea[3:] # Take only the 4 rect infos (x y w h)
+
+        intersect = intersection_area(objectBox, forbiddenBox)
+        if intersect > 0:
+            triggeredAreas.append((intersect, forbiddenArea[0]))
+        totalArea += intersect
     objectArea = objectBox[2] * objectBox[3]
     if totalArea > 0 and (totalArea > objectArea or totalArea / objectArea >= INTER_THRESHOLD):
         return True
@@ -244,11 +249,13 @@ class Detection(Thread):
                     if not isNew:
                         color = (255, 0, 0)  # Bleu si l'objet est deja connu
                     else:
-                        color = (0, 255, 0)  # Vert so c'est un nouvel objet
-
-                    if is_in_area(box, self.forbidden_areas):
+                        color = (0, 255, 0)  # Vert si c'est un nouvel objet
+                    triggeredAreas = list()
+                    if is_in_areas(box, self.forbidden_areas, triggeredAreas):
                         #envoi log pour la BDD
-                        self.forbidden_areas_queue.put(0)
+                        triggeredAreas.sort()
+                        # Send only the area where the animal is the most in
+                        self.forbidden_areas_queue.put(triggeredAreas[0])
                         # execute l'action
                         # TODO: Electrocuter le chien :)
                         pass
