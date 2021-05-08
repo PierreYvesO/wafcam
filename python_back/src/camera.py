@@ -29,7 +29,8 @@ def threaded(fn):
 
 
 class Camera:
-    def __init__(self, queue, ip, cam_id, size=tuple(), display=False , user='', pwd=''):
+    def __init__(self, queue, ip, cam_id, websocket, size=tuple(), display=False , user='', pwd=''):
+        self.websocket = websocket
         self.cam_queue: mQueue = queue
         self.ip = self.parseURL(ip,user,pwd)
         self.display = display
@@ -108,10 +109,11 @@ class Camera:
                 res = self.detection_result.get(timeout=5)
             except Empty:
                 # on garde la meme date pour tous les envois
-                time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 for animal in res:
-                    self.db.addLog(animal, res[animal], self.id, time)
+                    self.db.addDetectedAnimalLog(animal, res[animal], self.id, timestamp)
                 print("result_log_detected = " + str(res))
+                self.websocket.send_update()
                 res = {}
         self.stop_all()
 
@@ -124,10 +126,11 @@ class Camera:
                 res = self.forbidden_access_queue.get(timeout=2)
             except Empty:
                 # on garde la meme date pour tous les envois
-                date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 for animal in res:
-                    # TODO: Add insert for forbidden accesses db
+                    self.db.addDetectedInForbiddenAreaLog(animal, 0, self.id, timestamp)
                     pass
                 print("result_log_in_area = " + str(res))
+                self.websocket.send_update()
                 time.sleep(10)
                 res = {}
