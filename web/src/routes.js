@@ -35,30 +35,12 @@ app.get('/rooms', function (req, res) {
   });
 });
 
-// Creating a GET route that returns data from the 'entity' table.
-app.get('/entities', function (req, res) {
-  // Connecting to the database.
-  connection.getConnection(function (err, connection) {
-    // Executing the MySQL query (select all data from the 'entity' table).
-    connection.query('SELECT * FROM entity', function (error, results, fields) {
-      // When done with the connection, release it.
-      connection.release();
-
-      // If some error occurs, we throw an error.
-      if (error) throw error;
-
-      // Getting the 'response' from the database and sending it to our route. This is were the data is.
-      res.send(results);
-    });
-  });
-});
-
 // Creating a GET route that returns data from the 'forbidden_area' table.
-app.get('/forbidden_areas', function (req, res) {
+app.get('/areas', function (req, res) {
   // Connecting to the database.
   connection.getConnection(function (err, connection) {
     // Executing the MySQL query (select all data from the 'forbidden_area' table).
-    connection.query('SELECT * FROM forbidden_area', function (error, results, fields) {
+    connection.query('SELECT * FROM area', function (error, results, fields) {
       // When done with the connection, release it.
       connection.release();
 
@@ -71,20 +53,19 @@ app.get('/forbidden_areas', function (req, res) {
   });
 });
 
-app.post('/forbidden_areas', function (req, res) {
+app.post('/areas', function (req, res) {
   // Connecting to the database.
   connection.getConnection(function (err, connection) {
-    const valuesToInsert = req.body.filter(area => typeof area.id === "string").map((area) => {
-      delete area.id;
+    const valuesToInsert = req.body.filter(area => typeof area.id_area === "string").map((area) => {
+      delete area.id_area;
       return Object.values(area);
     });
-    const valuesToUpdate = req.body.filter(area => area.id !== undefined).map((area) => {
+    const valuesToUpdate = req.body.filter(area => area.id_area !== undefined).map((area) => {
       return Object.values(area);
     });
-    console.log(valuesToUpdate);
     if (valuesToInsert.length > 0) {
       connection.query(
-        'INSERT INTO forbidden_area (room_id, position_x, position_y, width, height) VALUES ?',
+        'INSERT INTO area (id_camera, name, x, y, w, h) VALUES ?',
         [valuesToInsert],
         function (error, results, fields) {
           // If some error occurs, we throw an error.
@@ -95,7 +76,7 @@ app.post('/forbidden_areas', function (req, res) {
     if (valuesToUpdate.length > 0) {
       valuesToUpdate.map((area) => {
         connection.query(
-          'UPDATE forbidden_area SET room_id = ?, position_x = ?, position_y = ?, width = ?, height = ? WHERE id = ?',
+          'UPDATE area SET id_camera = ?, name = ?, x = ?, y = ?, w = ?, h = ? WHERE id_area = ?',
           area,
           function (error, results, fields) {
             // If some error occurs, we throw an error.

@@ -32,28 +32,30 @@ class Cameras extends React.Component {
   handleSave() {
     const areas = this.camToolNode.current.state.rectangles.map((rect) => {
       return {
-        room_id: 1,
-        position_x: Math.round(rect.x),
-        position_y: Math.round(rect.y),
-        width: Math.round(rect.width),
-        height: Math.round(rect.height),
-        id: rect.id
+        id_camera: 0,
+        name: null,
+        x: Math.round(rect.x),
+        y: Math.round(rect.y),
+        w: Math.round(rect.width),
+        h: Math.round(rect.height),
+        id_area: rect.id
       }
     });
-    axios.post('http://localhost:4000/forbidden_areas', areas)
+    axios.post('http://localhost:4000/areas', areas)
   }
 
   render() {
-    const initialRectangles = this.props.forbiddenAreas.map((area) => {
+    const initialRectangles = this.props.areas.map((area) => {
       return {
-        id: area.id,
-        x: area.position_x * this.state.imgWidth / this.state.imgNaturalWidth,
-        y: area.position_y * this.state.imgHeight / this.state.imgNaturalHeight,
-        width: area.width * this.state.imgWidth / this.state.imgNaturalWidth,
-        height: area.height * this.state.imgHeight / this.state.imgNaturalHeight,
+        id: area.id_area,
+        x: area.x * this.state.imgWidth / this.state.imgNaturalWidth,
+        y: area.y * this.state.imgHeight / this.state.imgNaturalHeight,
+        width: area.w * this.state.imgWidth / this.state.imgNaturalWidth,
+        height: area.h * this.state.imgHeight / this.state.imgNaturalHeight,
         stroke: '#f00',
         strokeWidth: 4,
-        draggable: this.state.editMode
+        draggable: this.state.editMode,
+        name: 'je suis un rectangle'
       }
     });
 

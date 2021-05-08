@@ -8,15 +8,15 @@ import NotFound from './pages/NotFound';
 
 const App = () => {
   const [rooms, setRooms] = useState([]);
-  const [forbiddenAreas, setForbiddenAreas] = useState([]);
+  const [areas, setAreas] = useState([]);
 
   useEffect(() => {
     async function fetchData() {
       let response;
       response = await axios('http://localhost:4000/rooms');
       setRooms(response.data);
-      response = await axios('http://localhost:4000/forbidden_areas');
-      setForbiddenAreas(response.data);
+      response = await axios('http://localhost:4000/areas');
+      setAreas(response.data);
     }
     fetchData();
   }, []);
@@ -26,7 +26,7 @@ const App = () => {
     <BrowserRouter>
       <Switch>
         <Route path="/" exact component={Home} />
-        <Route path="/cameras" exact component={() => <Cameras forbiddenAreas={forbiddenAreas} />} />
+        <Route path="/cameras" exact component={() => <Cameras areas={areas} />} />
         <Route path="/rooms" exact component={() => <Rooms rooms={rooms} />} />
         <Route component={NotFound} />
       </Switch>
