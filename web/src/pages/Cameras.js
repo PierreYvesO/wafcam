@@ -33,7 +33,7 @@ class Cameras extends React.Component {
     const areas = this.camToolNode.current.state.rectangles.map((rect) => {
       return {
         id_camera: 0,
-        name: null,
+        name: rect.name,
         x: Math.round(rect.x),
         y: Math.round(rect.y),
         w: Math.round(rect.width),
@@ -55,7 +55,7 @@ class Cameras extends React.Component {
         stroke: '#f00',
         strokeWidth: 4,
         draggable: this.state.editMode,
-        name: 'je suis un rectangle'
+        name: area.name
       }
     });
 

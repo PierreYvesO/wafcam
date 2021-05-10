@@ -1,5 +1,5 @@
 import React from 'react';
-import { Stage, Rect, Layer, Transformer } from 'react-konva';
+import { Stage, Rect, Layer, Transformer, Label, Text, Tag } from 'react-konva';
 
 const Rectangle = ({ shapeProps, isSelected, onSelect, onChange, canvasSize, editMode }) => {
   const shapeRef = React.useRef();
@@ -88,6 +88,68 @@ const Rectangle = ({ shapeProps, isSelected, onSelect, onChange, canvasSize, edi
           }}
         />
       )}
+      <Label
+        x={shapeProps.x + 5}
+        y={shapeProps.y + 5}
+        width={shapeProps.width}
+        height={25}
+        onClick={(evt) => {
+          if (editMode) {
+            var textarea = document.createElement('textarea');
+            var camTool = document.querySelector(".camTool");
+            camTool.appendChild(textarea);
+            textarea.value = shapeProps.name;
+            textarea.style.position = 'absolute';
+            textarea.style.top = evt.target.parent.attrs.y + 'px';
+            textarea.style.left = evt.target.parent.attrs.x + 'px';
+            textarea.style.width = (evt.target.parent.attrs.width - 10) + 'px';
+            textarea.style.height = 25 + 'px';
+            textarea.style.fontSize = 20 + 'px';
+            textarea.style.border = 'none';
+            textarea.style.padding = '0px';
+            textarea.style.margin = '0px';
+            textarea.style.overflow = 'hidden';
+            textarea.style.outline = 'none';
+            textarea.style.resize = 'none';
+            textarea.style.transformOrigin = 'left top';
+            textarea.focus();
+            function removeTextarea() {
+              camTool.removeChild(textarea);
+              window.removeEventListener('click', handleOutsideClick);
+            }
+            textarea.addEventListener('keydown', function (e) {
+              // hide on enter
+              // but don't hide on shift + enter
+              if (e.keyCode === 13 && !e.shiftKey) {
+                shapeProps.name = textarea.value;
+                removeTextarea();
+              }
+              // on esc do not set value back to node
+              if (e.keyCode === 27) {
+                removeTextarea();
+              }
+            });
+            function handleOutsideClick(e) {
+              if (e.target !== textarea) {
+                shapeProps.name = textarea.value;
+                removeTextarea();
+              }
+            }
+            setTimeout(() => {
+              window.addEventListener('click', handleOutsideClick);
+            });
+          }
+        }}
+      >
+        <Tag
+          fill={editMode ? '#0f0' : '#f00'}
+          opacity={0.3}
+        />
+        <Text
+          text={shapeProps.name}
+          fontSize={20}
+        />
+      </Label>
     </React.Fragment>
   );
 };
