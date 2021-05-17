@@ -23,8 +23,8 @@ class Wafcam(WebSocket):
         self.launch()
 
     def launch(self):
-        # db = Database(test_config)
-        db = Database(database_utils.read_env())
+        db = Database(test_config)
+        # db = Database(database_utils.read_env())
         room_ids = db.getRooms()
 
         for room_id in room_ids:
@@ -32,7 +32,7 @@ class Wafcam(WebSocket):
             queue = Queue()
             camera_ip, user, pwd = db.getCameraFromRoomWithID(room_id)[0]
             # camera_ip = 0
-            p = Process(target=Camera, args=(queue, camera_ip, self, room_id, (1280, 720), True, user, pwd))
+            p = Process(target=Camera, args=(queue, camera_ip, room_id, self, (1280, 720), True, user, pwd))
             p.start()
             self.queues.append(queue)
             self.cams.append(p)

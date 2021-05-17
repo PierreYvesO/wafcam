@@ -1,5 +1,5 @@
-import asyncio
 import threading
+from playsound import playsound
 from datetime import datetime
 import time
 
@@ -29,10 +29,10 @@ def threaded(fn):
 
 
 class Camera:
-    def __init__(self, queue, ip, cam_id, websocket, size=tuple(), display=False , user='', pwd=''):
+    def __init__(self, queue, ip, cam_id, websocket, size=tuple(), display=False, user='', pwd=''):
         self.websocket = websocket
         self.cam_queue: mQueue = queue
-        self.ip = self.parseURL(ip,user,pwd)
+        self.ip = self.parseURL(ip, user, pwd)
         self.display = display
         self.id = cam_id
         self.size = size
@@ -128,6 +128,7 @@ class Camera:
                 # on garde la meme date pour tous les envois
                 timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 for animal in res:
+                    playsound("./python_back/byebye_patafix.mp3", block=False)
                     self.db.addDetectedInForbiddenAreaLog(animal, 0, self.id, timestamp)
                     pass
                 print("result_log_in_area = " + str(res))

@@ -203,7 +203,7 @@ class Detection(Thread):
         # test d'une lecture de premiereframe
         sucess, _ = self.cam.getFrame()
         if not sucess:
-            raise Exception("Impossible d'ouvrir le flux video donné")
+            raise Exception(f"Impossible d'ouvrir le flux video {0}".format(self.cam.ip))
         detected = list()  # liste des objets detectes
         start_time = time.time()
         classDetected = {}  # Liste des objects detecté dans la scene pendant 1s
@@ -310,7 +310,7 @@ class Detection(Thread):
         if len(output) > 0:
             for i, nb in enumerate(animals):
                 self.lastInfos[i] = nb
-            print(output)
+            # print(output)
             # Envoie les infos vers la camera
             with self.result.mutex:
                 self.result.queue.clear()

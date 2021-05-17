@@ -4,7 +4,7 @@ from python_back.src.wafcam_websocket import Wafcam
 
 
 def init_project():
-    server = WebSocketServer('', 8000, Wafcam, select_interval=None)
+    server = WebSocketServer('localhost', 8000, Wafcam, select_interval=None)
     server.serve_forever()
 
 
