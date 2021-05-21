@@ -100,6 +100,7 @@ def is_in_areas(objectBox, forbiddenAreas, triggeredAreas):
         forbiddenBox = forbiddenArea[3:] # Take only the 4 rect infos (x y w h)
 
         intersect = intersection_area(objectBox, forbiddenBox)
+        # Ajoute l'id de la zone à la liste s'il y a collision
         if intersect > 0:
             triggeredAreas.append((intersect, forbiddenArea[0]))
         totalArea += intersect
@@ -188,6 +189,8 @@ class Detection(Thread):
 
         self.display = display
         self.lastInfos = []
+        self.lastTriggeredArea = 0
+        self.lastTimeTriggeredArea = time.time()
         for _ in self.displayMap:
             self.lastInfos.append(0)
 
@@ -203,7 +206,7 @@ class Detection(Thread):
         # test d'une lecture de premiereframe
         sucess, _ = self.cam.getFrame()
         if not sucess:
-            raise Exception("Impossible d'ouvrir le flux video donné")
+            raise Exception(f"Impossible d'ouvrir le flux video {0}".format(self.cam.ip))
         detected = list()  # liste des objets detectes
         start_time = time.time()
         classDetected = {}  # Liste des objects detecté dans la scene pendant 1s
@@ -251,14 +254,15 @@ class Detection(Thread):
                     else:
                         color = (0, 255, 0)  # Vert si c'est un nouvel objet
                     triggeredAreas = list()
+                    # Verifie si l'animal est dans une ou plusieurs zone interdite
                     if is_in_areas(box, self.forbidden_areas, triggeredAreas):
-                        #envoi log pour la BDD
                         triggeredAreas.sort()
-                        # Send only the area where the animal is the most in
-                        self.forbidden_areas_queue.put(triggeredAreas[0])
-                        # execute l'action
-                        # TODO: Electrocuter le chien :)
-                        pass
+                        if self.lastTriggeredArea != triggeredAreas[0] and self.lastTimeTriggeredArea - time.time() > 5:
+                            # Envoie seuelement la zone ou l'animal est le plus dedans
+                            self.forbidden_areas_queue.put(triggeredAreas[0])
+                            # Evite la répétition d'envoi de log
+                            self.lastTimeTriggeredArea = time.time()
+
                     # Ajout du nouvel element detecté dans la liste
                     temp_detected.append((className, (new_center, time.time())))
 
@@ -268,7 +272,7 @@ class Detection(Thread):
                     classDetected[elmt[0]].append(elmt[1])
 
                 # Dans le cas de faux positifs, la detection est en general tres succinte, pour palier a ce probleme et
-                # eviter que ces erreurs de detection influe sur les resultats de la detection, on supprime les objets
+                # eviter que ces erreurs de detection influent sur les resultats de la detection, on supprime les objets
                 # detectes il y a plus d'1 seconde et on supprime la cle du dictionnaire si besoin.
                 toDelete = list()
                 for className in classDetected:
@@ -310,7 +314,7 @@ class Detection(Thread):
         if len(output) > 0:
             for i, nb in enumerate(animals):
                 self.lastInfos[i] = nb
-            print(output)
+            # print(output)
             # Envoie les infos vers la camera
             with self.result.mutex:
                 self.result.queue.clear()
