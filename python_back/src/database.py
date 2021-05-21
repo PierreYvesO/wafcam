@@ -39,11 +39,14 @@ class Database:
     def addDetectedInForbiddenAreaLog(self, animal, id_forbidden_area, camera_id, timestamp):
         self.addLog(animal, None, camera_id, id_forbidden_area, timestamp)
 
-    def buildSelect(self, table):
+    def buildSelect(self, table, simpleCondition=None):
         self.wait_available()
         self.processing = True
         cursor = self.db.cursor(prepared=True)
-        cursor.execute("SELECT {1} FROM {0}".format(table[0], ",".join(table[1])))
+        sql_request = "SELECT {1} FROM {0}".format(table[0], ",".join(table[1]))
+        if simpleCondition is not None:
+            sql_request += f" WHERE {'='.join(simpleCondition)}"
+        cursor.execute()
         res = cursor.fetchall()
         cursor.close()
         self.processing = False
@@ -58,6 +61,8 @@ class Database:
     def getCameras(self):
         return self.buildSelect(CAMERA_TABLE)
 
+    def getCamerasFromID(self, id):
+        return self.buildSelect(CAMERA_TABLE, ["idcamera", id])
     def getForbiddenAreas(self):
         return self.buildSelect(FORBIDDEN_TABLE)
 
