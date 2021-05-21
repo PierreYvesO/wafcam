@@ -3,7 +3,7 @@ from simple_websocket_server import WebSocket, WebSocketServer
 from multiprocessing import Process, Queue
 
 from python_back.src.database import Database
-from python_back.src.camera import Camera
+from python_back.src.camera import Camera, threaded
 
 clients = []
 cams = dict()
@@ -91,7 +91,7 @@ def reload(value: int = None, delete=False):
 
 
 
-@cam.threaded
+@threaded
 def send_update_ws():
     """
     Récupère les données envoyés par les caméras pour le websocket

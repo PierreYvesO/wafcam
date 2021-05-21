@@ -46,7 +46,7 @@ class Database:
         sql_request = "SELECT {1} FROM {0}".format(table[0], ",".join(table[1]))
         if simpleCondition is not None:
             sql_request += f" WHERE {'='.join(simpleCondition)}"
-        cursor.execute()
+        cursor.execute(sql_request)
         res = cursor.fetchall()
         cursor.close()
         self.processing = False
