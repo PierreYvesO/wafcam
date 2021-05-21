@@ -9,6 +9,7 @@ import NotFound from './pages/NotFound';
 const App = () => {
   const [rooms, setRooms] = useState([]);
   const [areas, setAreas] = useState([]);
+  const [cameras, setCameras] = useState([]);
 
   useEffect(() => {
     async function fetchData() {
@@ -17,17 +18,18 @@ const App = () => {
       setRooms(response.data);
       response = await axios('http://localhost:4000/areas');
       setAreas(response.data);
+      response = await axios('http://localhost:4000/cameras');
+      setCameras(response.data);
     }
     fetchData();
   }, []);
-  
 
   return (
     <BrowserRouter>
       <Switch>
         <Route path="/" exact component={Home} />
-        <Route path="/cameras" exact component={() => <Cameras areas={areas} />} />
-        <Route path="/rooms" exact component={() => <Rooms rooms={rooms} />} />
+        <Route path="/cameras" exact component={() => <Cameras areas={areas} cameras={cameras} />} />
+        <Route path="/rooms" exact component={() => <Rooms rooms={rooms} cameras={cameras} />} />
         <Route component={NotFound} />
       </Switch>
     </BrowserRouter>

@@ -62,3 +62,29 @@ a:visited {
     margin-right: 15px;
   }
 }
+.roomTool {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+.roomTable {
+  flex: 2;
+}
+.roomForm {
+  flex: 1;
+  margin-left: 30px;
+  padding: 20px;
+  .camList {
+    margin-top: 15px !important;
+    border: solid 1px;
+    border-color: rgb(196, 196, 196);
+    border-radius: 4px;
+  }
+  .addCamButton {
+    float: right;
+  }
+  .MuiButton-root {
+    margin-top: 20px;
+    float: right;
+  }
+}

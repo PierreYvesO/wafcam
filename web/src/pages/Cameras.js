@@ -17,6 +17,7 @@ class Cameras extends React.Component {
     imgNaturalHeight: 1,
     imgNaturalWidth: 1,
     editMode: false,
+    tabValue: 0
   };
 
   handleImageLoaded() {
@@ -41,7 +42,13 @@ class Cameras extends React.Component {
         id_area: rect.id
       }
     });
-    axios.post('http://localhost:4000/areas', areas)
+    axios.post('http://localhost:4000/areas', areas);
+  }
+
+  handleChangeTab(event, newValue) {
+    this.setState({
+      tabValue: newValue
+    });
   }
 
   render() {
@@ -59,13 +66,18 @@ class Cameras extends React.Component {
       }
     });
 
+    var url = "";
+    if (this.props.cameras.length !== 0) {
+      url = this.props.cameras[0].ip_adress + "/videostream.cgi?user=" + this.props.cameras[0].user + "&pwd=" + this.props.cameras[0].password;
+    }
+
     return (
       <>
         <Navigation />
         <div className="Content">
           <h1>Caméras</h1>
           <div className="camTool">
-            <img src="http://81.83.10.9:8001/mjpg/video.mjpg" alt="caméra doguito" onLoad={this.handleImageLoaded.bind(this)} />
+            <img src={url} alt="caméra doguito" onLoad={this.handleImageLoaded.bind(this)} />
             <CamTool
               width={this.state.imgWidth}
               height={this.state.imgHeight}

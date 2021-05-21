@@ -53,6 +53,7 @@ app.get('/areas', function (req, res) {
   });
 });
 
+// Creating a POST route that insert or update area(s) in the 'area' table.
 app.post('/areas', function (req, res) {
   // Connecting to the database.
   connection.getConnection(function (err, connection) {
@@ -86,6 +87,107 @@ app.post('/areas', function (req, res) {
       })
     }
     // When done with the connection, release it.
+    connection.release();
+  });
+});
+
+// Creating a DELETE route that delete one area by id from the 'area' table.
+app.delete('/area/:id', function (req, res) {
+  // Connecting to the database.
+  connection.getConnection(function (err, connection) {
+    connection.query(
+      'DELETE FROM area WHERE id_area = ?',
+      req.params.id,
+      function (error, results, fields) {
+        // If some error occurs, we throw an error.
+        if (error) throw error;
+      }
+    );
+    connection.release();
+  });
+});
+
+// Creating a GET route that returns data from the 'camera' table.
+app.get('/cameras', function (req, res) {
+  // Connecting to the database.
+  connection.getConnection(function (err, connection) {
+    // Executing the MySQL query (select all data from the 'room' table).
+    connection.query('SELECT * FROM camera', function (error, results, fields) {
+      // If some error occurs, we throw an error.
+      if (error) throw error;
+
+      // Getting the 'response' from the database and sending it to our route. This is were the data is.
+      res.send(results);
+
+      // When done with the connection, release it.
+      connection.release();
+    });
+  });
+});
+
+// Creating a DELETE route that delete one room by id from the 'room' table and all cameras from the 'camera' table link to this room.
+app.delete('/room/:id', function (req, res) {
+  // Connecting to the database.
+  connection.getConnection(function (err, connection) {
+    connection.query(
+      'DELETE FROM camera WHERE id_room = ?;',
+      req.params.id,
+      function (error, results, fields) {
+        // If some error occurs, we throw an error.
+        if (error) throw error;
+      }
+    );
+    connection.query(
+      'DELETE FROM room WHERE id_room = ?',
+      req.params.id,
+      function (error, results, fields) {
+        // If some error occurs, we throw an error.
+        if (error) throw error;
+      }
+    );
+    connection.release();
+  });
+});
+
+app.put('/room', function (req, res) {
+  // Connecting to the database.
+  connection.getConnection(function (err, connection) {
+    if (req.body.id_room === null) {
+      connection.query(
+        'INSERT INTO room (name) VALUES (?)',
+        [req.body.name],
+        function (error, results, fields) {
+          // If some error occurs, we throw an error.
+          if (error) throw error;
+        }
+      );
+    } else {
+      connection.query(
+        'UPDATE room SET name = ? WHERE id_room = ?',
+        [req.body.name, req.body.id_room],
+        function (error, results, fields) {
+          // If some error occurs, we throw an error.
+          if (error) throw error;
+        }
+      );
+    }
+    // When done with the connection, release it.
+    connection.release();
+  });
+});
+
+// Creating a DELETE route that delete one camera from the 'camera' table.
+app.delete('/camera/:id', function (req, res) {
+  // Connecting to the database.
+  connection.getConnection(function (err, connection) {
+    connection.query(
+      'DELETE FROM camera WHERE id_camera = ?;',
+      req.params.id,
+      function (error, results, fields) {
+        // If some error occurs, we throw an error.
+        if (error) throw error;
+      }
+    );
     connection.release();
   });
 });

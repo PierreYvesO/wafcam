@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React from 'react';
 import { Stage, Rect, Layer, Transformer, Label, Text, Tag } from 'react-konva';
 
@@ -121,7 +122,9 @@ const Rectangle = ({ shapeProps, isSelected, onSelect, onChange, canvasSize, edi
               // hide on enter
               // but don't hide on shift + enter
               if (e.keyCode === 13 && !e.shiftKey) {
-                shapeProps.name = textarea.value;
+                if (textarea.value !== '') {
+                  shapeProps.name = textarea.value;
+                }
                 removeTextarea();
               }
               // on esc do not set value back to node
@@ -131,7 +134,9 @@ const Rectangle = ({ shapeProps, isSelected, onSelect, onChange, canvasSize, edi
             });
             function handleOutsideClick(e) {
               if (e.target !== textarea) {
-                shapeProps.name = textarea.value;
+                if (textarea.value !== '') {
+                  shapeProps.name = textarea.value;
+                }
                 removeTextarea();
               }
             }
@@ -180,7 +185,8 @@ class CamTool extends React.Component {
       stroke: '#f00',
       strokeWidth: 4,
       id: "new" + (this.state.countNewRectangles + 1),
-      draggable: this.props.editMode
+      draggable: this.props.editMode,
+      name: "<nom_zone>"
     });
     this.setState({
       countNewRectangles: this.state.countNewRectangles + 1,
@@ -192,6 +198,7 @@ class CamTool extends React.Component {
   deleteRectangle = () => {
     for (let i = 0; i < this.state.rectangles.length; i++) {
       if (this.state.rectangles[i].id === this.state.selectedId) {
+        axios.delete('http://localhost:4000/area/' + this.state.selectedId);
         this.state.rectangles.splice(i, 1);
         break;
       }
