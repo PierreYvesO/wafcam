@@ -70,12 +70,12 @@ CREATE TABLE IF NOT EXISTS `area` (
 
 DROP TABLE IF EXISTS `camera`;
 CREATE TABLE IF NOT EXISTS `camera` (
-  `idcamera` int(11) NOT NULL AUTO_INCREMENT,
+  `id_camera` int(11) NOT NULL AUTO_INCREMENT,
   `ip_adress` varchar(200) NOT NULL,
   `user` varchar(45) NOT NULL,
   `password` varchar(200) NOT NULL,
   `id_room` int(11) DEFAULT NULL,
-  PRIMARY KEY (`idcamera`),
+  PRIMARY KEY (`id_camera`),
   KEY `room_id_idx` (`id_room`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS `camera` (
 -- Déchargement des données de la table `camera`
 --
 
-INSERT INTO `camera` (`idcamera`, `ip_adress`, `user`, `password`, `id_room`) VALUES
+INSERT INTO `camera` (`id_camera`, `ip_adress`, `user`, `password`, `id_room`) VALUES
 (0, '192.168.1.47/videostream.cgi', 'visitor', 'patcam60', 0);
 
 -- --------------------------------------------------------
@@ -134,7 +134,7 @@ INSERT INTO `room` (`id_room`, `name`) VALUES
 -- Contraintes pour la table `area`
 --
 ALTER TABLE `area`
-  ADD CONSTRAINT `fk_id_camera` FOREIGN KEY (`id_camera`) REFERENCES `camera` (`idcamera`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_id_camera` FOREIGN KEY (`id_camera`) REFERENCES `camera` (`id_camera`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Contraintes pour la table `camera`
@@ -148,7 +148,7 @@ ALTER TABLE `camera`
 ALTER TABLE `log`
   ADD CONSTRAINT `fk_animal` FOREIGN KEY (`id_animal`) REFERENCES `animal` (`id_animal`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_area` FOREIGN KEY (`id_area`) REFERENCES `area` (`id_area`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_camera` FOREIGN KEY (`id_camera`) REFERENCES `camera` (`idcamera`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_camera` FOREIGN KEY (`id_camera`) REFERENCES `camera` (`id_camera`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

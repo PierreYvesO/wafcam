@@ -5,7 +5,7 @@ LOG_TABLE = ("log", ["id_camera", "id_animal", "number", "id_area" , "timestamp"
 ENTITY_TABLE = ("animal", ["*"])
 ROOM_TABLE = ("room", ["id_room"])
 FORBIDDEN_TABLE = ("area", ["*"])
-CAMERA_TABLE = ("camera", ["idcamera", "ip_adress", "user", "password"])
+CAMERA_TABLE = ("camera", ["id_camera", "ip_adress", "user", "password"])
 
 
 class Database:
