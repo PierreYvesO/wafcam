@@ -1,11 +1,11 @@
 import mysql.connector
 from python_back.src.database_utils import config as prod_config
 
-LOG_TABLE = ("log", "id_camera", "id_animal", "number", "id_area" , "timestamp")
-ENTITY_TABLE = ("animal", "*")
-ROOM_TABLE = ("room", "id_room")
-FORBIDDEN_TABLE = ("area", "*")
-CAMERA_TABLE = ("camera", "ip_adress", "user", "password")
+LOG_TABLE = ("log", ["id_camera", "id_animal", "number", "id_area" , "timestamp"])
+ENTITY_TABLE = ("animal", ["*"])
+ROOM_TABLE = ("room", ["id_room"])
+FORBIDDEN_TABLE = ("area", ["*"])
+CAMERA_TABLE = ("camera", ["idcamera", "ip_adress", "user", "password"])
 
 
 class Database:
@@ -25,8 +25,8 @@ class Database:
         self.processing = True
         cursor = self.db.cursor(prepared=True)
         sql_insert = "INSERT INTO  `{0}`" \
-                     "({1}, {2}, {3}, {4}, {5})" \
-                     "VALUES (%s, %s, %s, %s, %s)".format(*LOG_TABLE)
+                     "({1})" \
+                     "VALUES (%s, %s, %s, %s, %s)".format(LOG_TABLE[0], ",".join(LOG_TABLE[1]))
         sql_data = (camera_id, animal, number, id_forbidden_area, timestamp)
         cursor.execute(sql_insert, sql_data)
         self.db.commit()
@@ -43,7 +43,7 @@ class Database:
         self.wait_available()
         self.processing = True
         cursor = self.db.cursor(prepared=True)
-        cursor.execute("SELECT {1} FROM {0}".format(*table))
+        cursor.execute("SELECT {1} FROM {0}".format(table[0], ",".join(table[1])))
         res = cursor.fetchall()
         cursor.close()
         self.processing = False
@@ -54,6 +54,9 @@ class Database:
 
     def getRooms(self):
         return self.buildSelect(ROOM_TABLE)
+
+    def getCameras(self):
+        return self.buildSelect(CAMERA_TABLE)
 
     def getForbiddenAreas(self):
         return self.buildSelect(FORBIDDEN_TABLE)

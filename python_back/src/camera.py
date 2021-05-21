@@ -2,15 +2,15 @@ import threading
 from playsound import playsound
 from datetime import datetime
 import time
-
-import cv2
-from python_back.src.detection import Detection
-from python_back.src.database import *
 from cv2.cv2 import VideoCapture
 from queue import Queue
-from python_back.src.database_utils import read_env
 from multiprocessing import Queue as mQueue
 from _queue import Empty
+import cv2
+
+from python_back.src.detection import Detection
+from python_back.src.database import *
+from python_back.src.database_utils import read_env
 
 
 def threaded(fn):
@@ -30,7 +30,7 @@ def threaded(fn):
 
 class Camera:
     def __init__(self, queue, ip, cam_id, websocket, size=tuple(), display=False, user='', pwd=''):
-        self.websocket = websocket
+        self.websocket_queue = websocket
         self.cam_queue: mQueue = queue
         self.ip = self.parseURL(ip, user, pwd)
         self.display = display
@@ -104,34 +104,37 @@ class Camera:
     @threaded
     def save_infos(self):
         res = {}
+        old_res = {}
         while self.cam_queue.empty():
             try:
                 res = self.detection_result.get(timeout=5)
             except Empty:
-                # on garde la meme date pour tous les envois
-                timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                for animal in res:
-                    self.db.addDetectedAnimalLog(animal, res[animal], self.id, timestamp)
-                print("result_log_detected = " + str(res))
-                self.websocket.send_update()
-                res = {}
+                if old_res != res:
+                    # on garde la meme date pour tous les envois
+                    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                    for animal in res:
+                        self.db.addDetectedAnimalLog(animal, res[animal], self.id, timestamp)
+                    print("result_log_detected = " + str(res))
+                    self.websocket_queue.put("info")
+                    res = old_res
         self.stop_all()
 
     @threaded
     def send_forbidden_access_infos(self):
 
         res = {}
+        old_res = {}
         while self.cam_queue.empty():
             try:
                 res = self.forbidden_access_queue.get(timeout=2)
             except Empty:
-                # on garde la meme date pour tous les envois
-                timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                for animal in res:
-                    playsound("./python_back/byebye_patafix.mp3", block=False)
-                    self.db.addDetectedInForbiddenAreaLog(animal, 0, self.id, timestamp)
-                    pass
-                print("result_log_in_area = " + str(res))
-                self.websocket.send_update()
-                time.sleep(10)
-                res = {}
+                if old_res != res:
+                    # on garde la meme date pour tous les envois
+                    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                    for animal in res:
+                        playsound("./python_back/byebye_patafix.mp3", block=False)
+                        self.db.addDetectedInForbiddenAreaLog(animal, 0, self.id, timestamp)
+                        pass
+                    print("result_log_in_area = " + str(res))
+                    self.websocket_queue.put("area")
+                    res = old_res
