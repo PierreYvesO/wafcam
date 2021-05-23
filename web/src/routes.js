@@ -149,6 +149,7 @@ app.delete('/room/:id', function (req, res) {
   });
 });
 
+// Creating a PUT route that insert or update a room in the 'room' table.
 app.put('/room', function (req, res) {
   // Connecting to the database.
   connection.getConnection(function (err, connection) {
@@ -188,6 +189,36 @@ app.delete('/camera/:id', function (req, res) {
         if (error) throw error;
       }
     );
+    connection.release();
+  });
+});
+
+// Creating a PUT route that insert or update a camera in the 'camera' table.
+app.put('/camera', function (req, res) {
+  // Connecting to the database.
+  connection.getConnection(function (err, connection) {
+    
+    console.log(bcrypt.hash('test', 10));
+    if (req.body.id_camera === null) {
+      connection.query(
+        'INSERT INTO camera (ip_adress, user, password, id_room) VALUES (?)',
+        [[req.body.ip_adress, req.body.user, req.body.password, req.body.id_room]],
+        function (error, results, fields) {
+          // If some error occurs, we throw an error.
+          if (error) throw error;
+        }
+      );
+    } else {
+      connection.query(
+        'UPDATE camera SET ip_adress = ?, user = ?, password = ?, id_room = ? WHERE id_camera = ?',
+        [req.body.ip_adress, req.body.user, req.body.password, req.body.id_room, req.body.id_camera],
+        function (error, results, fields) {
+          // If some error occurs, we throw an error.
+          if (error) throw error;
+        }
+      );
+    }
+    // When done with the connection, release it.
     connection.release();
   });
 });
