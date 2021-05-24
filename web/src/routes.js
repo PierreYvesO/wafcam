@@ -11,8 +11,6 @@ const connection = mysql.createPool({
   database : '2z2tz_patcam_test'
 });
 
-const ws = new WebSocket();
-
 // Starting our app.
 const app = express();
 app.use(express.json())
