@@ -11,6 +11,8 @@ const connection = mysql.createPool({
   database : '2z2tz_patcam_test'
 });
 
+const ws = new WebSocket();
+
 // Starting our app.
 const app = express();
 app.use(express.json())
@@ -197,8 +199,6 @@ app.delete('/camera/:id', function (req, res) {
 app.put('/camera', function (req, res) {
   // Connecting to the database.
   connection.getConnection(function (err, connection) {
-    
-    console.log(bcrypt.hash('test', 10));
     if (req.body.id_camera === null) {
       connection.query(
         'INSERT INTO camera (ip_adress, user, password, id_room) VALUES (?)',
