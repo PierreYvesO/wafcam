@@ -42,7 +42,7 @@ class Cameras extends React.Component {
         id_area: rect.id
       }
     });
-    axios.post('http://localhost:4000/areas', areas);
+    axios.post('http://92.89.142.198:4000/areas', areas);
   }
 
   handleChangeTab(event, newValue) {

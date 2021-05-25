@@ -14,11 +14,11 @@ const App = () => {
   useEffect(() => {
     async function fetchData() {
       let response;
-      response = await axios('http://localhost:4000/rooms');
+      response = await axios('http://92.89.142.198:4000/rooms');
       setRooms(response.data);
-      response = await axios('http://localhost:4000/areas');
+      response = await axios('http://92.89.142.198:4000/areas');
       setAreas(response.data);
-      response = await axios('http://localhost:4000/cameras');
+      response = await axios('http://92.89.142.198:4000/cameras');
       setCameras(response.data);
     }
     fetchData();

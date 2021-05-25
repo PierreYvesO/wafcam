@@ -77,24 +77,24 @@ const Rooms = (props) => {
   }
 
   function handleDeleteRoom() {
-    axios.delete('http://localhost:4000/room/' + roomToDelete.id_room);
+    axios.delete('http://92.89.142.198:4000/room/' + roomToDelete.id_room);
     handleResetRoomForm();
     window.location.reload();
   }
 
   function handleSaveRoom() {
-    axios.put('http://localhost:4000/room', roomToUpsert);
+    axios.put('http://92.89.142.198:4000/room', roomToUpsert);
     handleResetRoomForm();
     window.location.reload();
   }
 
   function handleDeleteCamera(id_camera) {
-    axios.delete('http://localhost:4000/camera/' + id_camera);
+    axios.delete('http://92.89.142.198:4000/camera/' + id_camera);
     window.location.reload();
   }
 
   function handleSaveCamera() {
-    axios.put('http://localhost:4000/camera', cameraToUpsert);
+    axios.put('http://92.89.142.198:4000/camera', cameraToUpsert);
     handleResetCamForm();
     window.location.reload();
   }
