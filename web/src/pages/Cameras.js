@@ -68,7 +68,7 @@ class Cameras extends React.Component {
 
     var url = "";
     if (this.props.cameras.length !== 0) {
-      url = this.props.cameras[0].ip_adress + "/videostream.cgi?user=" + this.props.cameras[0].user + "&pwd=" + this.props.cameras[0].password;
+      url = "http://" + this.props.cameras[0].ip_adress + "/videostream.cgi?user=" + this.props.cameras[0].user + "&pwd=" + this.props.cameras[0].password;
     }
 
     return (
