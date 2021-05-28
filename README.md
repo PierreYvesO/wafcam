@@ -100,6 +100,13 @@ In case you want to add a new module to the project make sure to update the requ
 ```
 pip freeze < requirements.txt
 ```
+Launch the python back-end
+```
+cd 'F:\Path\to\wafcam'
+$env:PYTHONPATH = 'F:\Path\to\wafcam'
+venv\Scripts\activate
+.\python_back\test\test.py
+```
 
 ### Unused/Optional Setup
 <details><summary>GPU Config</summary>
