@@ -1,3 +1,4 @@
+import time
 from _queue import Empty
 from simple_websocket_server import WebSocket, WebSocketServer
 from multiprocessing import Process, Queue
@@ -65,10 +66,16 @@ def launch(database_config, serv: WebSocketServer = None):
     db.closeConnection()
 
     send_update_ws()
+    launch_analysis(database_config)
+
+
 @threaded
-def launch_analysis():
-    analysis = Analysis()
-    analysis.start_analysis()
+def launch_analysis(database_config):
+    analysis = Analysis(config=database_config)
+    while True:
+        time.sleep(3600)
+        analysis.start_analysis()
+
 
 def reload(values, delete):
     """
