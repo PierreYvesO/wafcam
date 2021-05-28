@@ -28,7 +28,7 @@ const App = () => {
     <BrowserRouter>
       <Switch>
         <Route path="/" exact component={Home} />
-        <Route path="/cameras" exact component={() => <Cameras areas={areas} cameras={cameras} />} />
+        <Route path="/cameras" exact component={() => <Cameras areas={areas} cameras={cameras} rooms={rooms} />} />
         <Route path="/rooms" exact component={() => <Rooms rooms={rooms} cameras={cameras} />} />
         <Route component={NotFound} />
       </Switch>
