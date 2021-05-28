@@ -163,7 +163,8 @@ class CamTool extends React.Component {
   state = {
     rectangles: this.props.initialRectangles,
     selectedId: null,
-    countNewRectangles: 0
+    countNewRectangles: 0,
+    id_camera: -1
   };
 
   checkDeselect = (e) => {
@@ -208,6 +209,12 @@ class CamTool extends React.Component {
 
   render () {
     const { width, height, editMode } = this.props;
+    if (this.state.id_camera !== this.props.id_camera) {
+      this.setState({
+        rectangles: this.props.initialRectangles,
+        id_camera: this.props.id_camera
+      });
+    }
     return (
       <>
         <Stage
