@@ -1,7 +1,9 @@
-import mysql.connector
-from python_back.src.database_utils import config as prod_config
+from datetime import time, datetime
 
-LOG_TABLE = ("log", ["id_camera", "id_animal", "number", "id_area" , "timestamp"])
+import mysql.connector
+from python_back.src.database_utils import config as prod_config, isDatabaseSet, read_env
+
+LOG_TABLE = ("log", ["id_camera", "id_animal", "number", "id_area", "timestamp"])
 ENTITY_TABLE = ("animal", ["*"])
 ROOM_TABLE = ("room", ["id_room"])
 FORBIDDEN_TABLE = ("area", ["*"])
@@ -11,7 +13,10 @@ CAMERA_TABLE = ("camera", ["id_camera", "ip_adress", "user", "password"])
 class Database:
     def __init__(self, user_config=None):
         if user_config is None:
-            self.db = mysql.connector.connect(**prod_config)
+            if isDatabaseSet:
+                self.db = mysql.connector.connect(**prod_config)
+            else:
+                self.db = mysql.connector.connect(read_env())
         else:
             self.db = mysql.connector.connect(**user_config)
         self.processing = False
@@ -33,6 +38,11 @@ class Database:
         cursor.close()
         self.processing = False
 
+    def getLogs(self, time_elapsed):
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        condition = f"TIMESTAMPDIFF(SECOND, timestamp, '{timestamp}') < {time_elapsed}"
+        return self.buildSelect(LOG_TABLE, condition)
+
     def addDetectedAnimalLog(self, animal, number, camera_id, timestamp):
         self.addLog(animal, number, camera_id, None, timestamp)
 
@@ -45,7 +55,7 @@ class Database:
         cursor = self.db.cursor(prepared=True)
         sql_request = "SELECT {1} FROM {0}".format(table[0], ",".join(table[1]))
         if simpleCondition is not None:
-            sql_request += f" WHERE {'='.join(simpleCondition)}"
+            sql_request += f" WHERE {simpleCondition}"
         cursor.execute(sql_request)
         res = cursor.fetchall()
         cursor.close()
@@ -62,7 +72,8 @@ class Database:
         return self.buildSelect(CAMERA_TABLE)
 
     def getCamerasFromID(self, id):
-        return self.buildSelect(CAMERA_TABLE, ["idcamera", id])
+        return self.buildSelect(CAMERA_TABLE, f"idcamera={id}")
+
     def getForbiddenAreas(self):
         return self.buildSelect(FORBIDDEN_TABLE)
 
