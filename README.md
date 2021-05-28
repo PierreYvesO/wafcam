@@ -105,7 +105,7 @@ Launch the python back-end
 cd 'F:\Path\to\wafcam'
 $env:PYTHONPATH = 'F:\Path\to\wafcam'
 venv\Scripts\activate
-.\python_back\test\test.py
+.\python_back\launchWAFCAM.py
 ```
 
 ### Unused/Optional Setup
