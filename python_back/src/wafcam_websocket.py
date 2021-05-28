@@ -16,8 +16,8 @@ global server, config
 
 
 class WafcamSocket(WebSocket):
-    def __init__(self, server, sock, address):
-        super().__init__(server, sock, address)
+    def __init__(self, ws_server, sock, address):
+        super().__init__(ws_server, sock, address)
 
     def handle(self):
         elmt, value = self.data.split(' ')

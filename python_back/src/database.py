@@ -1,4 +1,4 @@
-from datetime import time, datetime
+from datetime import datetime
 
 import mysql.connector
 from python_back.src.database_utils import config as prod_config, isDatabaseSet, read_env
@@ -94,8 +94,8 @@ class Database:
     def getCameras(self):
         return self.buildSelect(CAMERA_TABLE)
 
-    def getCamerasFromID(self, id):
-        return self.buildSelect(CAMERA_TABLE, f"idcamera={id}")
+    def getCamerasFromID(self, cam_id):
+        return self.buildSelect(CAMERA_TABLE, f"idcamera={cam_id}")
 
     def getForbiddenAreas(self):
         return self.buildSelect(FORBIDDEN_TABLE)
@@ -114,5 +114,5 @@ class Database:
         while self.processing:
             pass
 
-    def getRoomFromCameraID(self, id):
-        self.buildSelect(ROOM_TABLE, f"id_room={id}")
+    def getRoomFromCameraID(self, cam_id):
+        self.buildSelect(ROOM_TABLE, f"id_room={cam_id}")

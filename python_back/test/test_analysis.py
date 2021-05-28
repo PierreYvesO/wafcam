@@ -8,9 +8,6 @@ test_config = {
     'raise_on_warnings': True
 }
 
-
-
-
 if __name__ == '__main__':
     analysis = Analysis(test_config)
     analysis.start_analysis(5000)

@@ -92,7 +92,8 @@ def is_in_areas(objectBox, forbiddenAreas, triggeredAreas):
     Une zone interdite qui est comprise dans le rectangle objectBox renvoi True directement
     Si plusieurs zones données se chevauchent l'intersection contera double
     @param objectBox: rectangle a tester
-    @param forbiddenBoxes: zones données
+    @param forbiddenAreas: zones données
+    @param triggeredAreas: zones en collision
     @return: True si l'aire du rectangel a tester et couvert a plus de INTER_THRESHOLD %
     """
     totalArea = 0
@@ -314,7 +315,6 @@ class Detection(Thread):
         if len(output) > 0:
             for i, nb in enumerate(animals):
                 self.lastInfos[i] = nb
-            # print(output)
             # Envoie les infos vers la camera
             with self.result.mutex:
                 self.result.queue.clear()
