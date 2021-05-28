@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const mysql = require('mysql');
 const cors = require('cors');
 const http = require('http');
+var WebSocket = require('ws')
 
 const connection = mysql.createPool({
   host     : 'localhost',
@@ -55,6 +56,16 @@ app.get('/areas', function (req, res) {
 
 // Creating a POST route that insert or update area(s) in the 'area' table.
 app.post('/areas', function (req, res) {
+  // Send data to WebSocket
+  var socket = new WebSocket("ws://localhost:8000");
+  socket.onerror = function(error) {
+    console.error(error);
+  };
+  socket.onopen = function(event) {
+    this.send("area " + req.body[0].id_camera);
+    this.close();
+  };
+
   // Connecting to the database.
   connection.getConnection(function (err, connection) {
     const valuesToInsert = req.body.filter(area => typeof area.id_area === "string").map((area) => {
@@ -93,6 +104,24 @@ app.post('/areas', function (req, res) {
 
 // Creating a DELETE route that delete one area by id from the 'area' table.
 app.delete('/area/:id', function (req, res) {
+  connection.query(
+    'SELECT id_camera FROM area WHERE id_area = ?',
+    req.params.id,
+    function (error, results, fields) {
+      // If some error occurs, we throw an error.
+      if (error) throw error;
+      // Send data to WebSocket
+      var socket = new WebSocket("ws://localhost:8000");
+      socket.onerror = function(error) {
+        console.error(error);
+      };
+      socket.onopen = function(event) {
+        this.send("area " + results[0].id_camera);
+        this.close();
+      };
+    }
+  );
+
   // Connecting to the database.
   connection.getConnection(function (err, connection) {
     connection.query(
@@ -129,6 +158,27 @@ app.get('/cameras', function (req, res) {
 app.delete('/room/:id', function (req, res) {
   // Connecting to the database.
   connection.getConnection(function (err, connection) {
+    connection.query(
+      'SELECT id_camera FROM camera WHERE id_room = ?',
+      req.params.id,
+      function (error, results, fields) {
+        // If some error occurs, we throw an error.
+        if (error) throw error;
+        // Send data to WebSocket
+        var socket = new WebSocket("ws://localhost:8000");
+        socket.onerror = function(error) {
+          console.error(error);
+        };
+        var camsId = results.map((res) => {
+          return res.id_camera;
+        })
+        socket.onopen = function(event) {
+          this.send("camdel " + camsId);
+          this.close();
+        };
+      }
+    );
+
     connection.query(
       'DELETE FROM camera WHERE id_room = ?;',
       req.params.id,
@@ -179,6 +229,16 @@ app.put('/room', function (req, res) {
 
 // Creating a DELETE route that delete one camera from the 'camera' table.
 app.delete('/camera/:id', function (req, res) {
+  // Send data to WebSocket
+  var socket = new WebSocket("ws://localhost:8000");
+  socket.onerror = function(error) {
+    console.error(error);
+  };
+  socket.onopen = function(event) {
+    this.send("camdel " + req.params.id);
+    this.close();
+  };
+
   // Connecting to the database.
   connection.getConnection(function (err, connection) {
     connection.query(
@@ -204,9 +264,27 @@ app.put('/camera', function (req, res) {
         function (error, results, fields) {
           // If some error occurs, we throw an error.
           if (error) throw error;
+          // Send data to WebSocket
+          var socket = new WebSocket("ws://localhost:8000");
+          socket.onerror = function(error) {
+            console.error(error);
+          };
+          socket.onopen = function(event) {
+            this.send("camupd " + results.insertId);
+            this.close();
+          };
         }
       );
     } else {
+      // Send data to WebSocket
+      var socket = new WebSocket("ws://localhost:8000");
+      socket.onerror = function(error) {
+        console.error(error);
+      };
+      socket.onopen = function(event) {
+        this.send("camupd " + req.body.id_camera);
+        this.close();
+      };
       connection.query(
         'UPDATE camera SET ip_adress = ?, user = ?, password = ?, id_room = ? WHERE id_camera = ?',
         [req.body.ip_adress, req.body.user, req.body.password, req.body.id_room, req.body.id_camera],

@@ -10,7 +10,7 @@ test_config = {
     'raise_on_warnings': True
 }
 def init_project():
-    server = WebSocketServer('localhost', 8000, WafcamSocket, select_interval=None)
+    server = WebSocketServer('127.0.0.1', 8000, WafcamSocket, select_interval=None)
     launch(test_config, server)
     server.serve_forever()
 
