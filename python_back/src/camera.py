@@ -1,7 +1,4 @@
-import threading
 from playsound import playsound
-from datetime import datetime
-import time
 from cv2.cv2 import VideoCapture
 from queue import Queue
 from multiprocessing import Queue as mQueue
@@ -11,21 +8,7 @@ import cv2
 from python_back.src.detection import Detection
 from python_back.src.database import *
 from python_back.src.database_utils import read_env
-
-
-def threaded(fn):
-    """
-    Allow to launch function with threads using decorators
-    @param fn: function to be threaded
-    @return: wrapper for thread
-    """
-    def wrapper(*args, **kwargs):
-        thread = threading.Thread(target=fn, args=args, kwargs=kwargs)
-        thread.daemon = True
-        thread.start()
-        return thread
-
-    return wrapper
+from python_back.src.utils import threaded
 
 
 class Camera:

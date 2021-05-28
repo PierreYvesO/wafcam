@@ -1,3 +1,4 @@
+isDatabaseSet = False
 config = {
     'user': '',
     'password': '',
@@ -16,6 +17,8 @@ user_config = {
 
 
 def read_env():
+    global isDatabaseSet, config
+    isDatabaseSet = True
     db_dict = {}
     f = open("../../.env.local", "r")
     for x in f:
@@ -24,6 +27,7 @@ def read_env():
     f.close()
     del db_dict['driver']
     db_dict['raise_on_warnings'] = True
+    config = db_dict
     return db_dict
 
 
