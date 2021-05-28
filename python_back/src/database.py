@@ -4,8 +4,10 @@ import mysql.connector
 from python_back.src.database_utils import config as prod_config, isDatabaseSet, read_env
 
 LOG_TABLE = ("log", ["id_camera", "id_animal", "number", "id_area", "timestamp"])
+ROOM_FROM_LOG_ANIMAL_TABLE = ("room", ["room.name"])
+AREA_FROM_LOG_ANIMAL_TABLE = ("area, room, camera", ["area.name, room.name"])
 ENTITY_TABLE = ("animal", ["*"])
-ROOM_TABLE = ("room", ["id_room"])
+ROOM_TABLE = ("room", ["id_room", "name"])
 FORBIDDEN_TABLE = ("area", ["*"])
 CAMERA_TABLE = ("camera", ["id_camera", "ip_adress", "user", "password"])
 
@@ -42,6 +44,27 @@ class Database:
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         condition = f"TIMESTAMPDIFF(SECOND, timestamp, '{timestamp}') < {time_elapsed}"
         return self.buildSelect(LOG_TABLE, condition)
+
+    def getRoomsFromLogByAnimalID(self, time_elapsed, animal_id):
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        condition = "room.id_room IN (SELECT log.id_camera " \
+                    "FROM `log` " \
+                    f"WHERE TIMESTAMPDIFF(SECOND, log.timestamp, '{timestamp}') < {time_elapsed} " \
+                    f"AND log.id_animal='{animal_id}' " \
+                    f"AND log.number is NOT NULL " \
+                    "GROUP BY log.id_camera)"
+        return self.buildSelect(ROOM_FROM_LOG_ANIMAL_TABLE, simpleCondition=condition)
+
+    def getAreasFromLogByAnimalID(self, time_elapsed, animal_id):
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        condition = "area.id_area IN (SELECT log.id_area " \
+                    "FROM `log` " \
+                    f"WHERE TIMESTAMPDIFF(SECOND, log.timestamp, '{timestamp}') < {time_elapsed} " \
+                    f"AND log.id_animal='{animal_id}' " \
+                    f"AND log.id_area is NOT NULL " \
+                    "GROUP BY log.id_camera)" \
+                    "and camera.id_camera=area.id_camera and room.id_room=camera.id_room"
+        return self.buildSelect(AREA_FROM_LOG_ANIMAL_TABLE, simpleCondition=condition)
 
     def addDetectedAnimalLog(self, animal, number, camera_id, timestamp):
         self.addLog(animal, number, camera_id, None, timestamp)
@@ -90,3 +113,6 @@ class Database:
     def wait_available(self):
         while self.processing:
             pass
+
+    def getRoomFromCameraID(self, id):
+        self.buildSelect(ROOM_TABLE, f"id_room={id}")

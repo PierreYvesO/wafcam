@@ -2,6 +2,7 @@ from _queue import Empty
 from simple_websocket_server import WebSocket, WebSocketServer
 from multiprocessing import Process, Queue
 
+from python_back.src.analysis import Analysis
 from python_back.src.database import Database
 from python_back.src.camera import Camera
 from python_back.src.utils import threaded
@@ -64,7 +65,10 @@ def launch(database_config, serv: WebSocketServer = None):
     db.closeConnection()
 
     send_update_ws()
-
+@threaded
+def launch_analysis():
+    analysis = Analysis()
+    analysis.start_analysis()
 
 def reload(values, delete):
     """
