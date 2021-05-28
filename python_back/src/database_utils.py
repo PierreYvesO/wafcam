@@ -20,7 +20,7 @@ def read_env():
     global isDatabaseSet, config
     isDatabaseSet = True
     db_dict = {}
-    f = open("../../.env.local", "r")
+    f = open(".env.local", "r")
     for x in f:
         tmp = x.split(":")
         db_dict[tmp[0].strip()] = tmp[1].strip()

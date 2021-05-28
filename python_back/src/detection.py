@@ -173,13 +173,13 @@ class Detection(Thread):
 
         # Lecture de la liste des objets detetable
         self.classNames: list
-        classFile = '../mobilenet_deploy/coco.names'
+        classFile = './python_back/mobilenet_deploy/coco.names'
         with open(classFile, 'rt') as f:
             self.classNames = f.read().rstrip('\n').split('\n')
 
         # Modele pour la reconnaissance
-        configPath = '../mobilenet_deploy/ssd_mobilenet_v3_large_coco_2020_01_14.pbtxt'
-        weightsPath = '../mobilenet_deploy/frozen_inference_graph.pb'
+        configPath = './python_back/mobilenet_deploy/ssd_mobilenet_v3_large_coco_2020_01_14.pbtxt'
+        weightsPath = './python_back/mobilenet_deploy/frozen_inference_graph.pb'
 
         # configuration du module de reconnaissance
         self.net = cv2.dnn_DetectionModel(weightsPath, configPath)
