@@ -103,8 +103,12 @@ a:visited {
 .homeText{
   padding: 10px;
 }
-#homeImg {
-  display: block;
-  margin: auto;
+.homeImgs {
+  display: flex;
+  justify-content: center;
   margin-top: 20px;
+  img {
+    height: fit-content;
+    margin: auto;
+  }
 }

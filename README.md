@@ -1,9 +1,9 @@
 # WAFCAM
 
-## Deploy your local server with Web App (Build v1)
+## Deploy your local Application (Build v3) on Windows 10
 
 1. Install WAMP Server
-2. Add React Build to Local Server
+2. Install dependencies
 
 ### Setup Local Server (Wamp Server on Windows 10)
 > https://sourceforge.net/projects/wampserver/files/WampServer%203/WampServer%203.0.0/ - Version : 3.2.3
@@ -17,12 +17,41 @@ Installation guide :
     - PhpMyAdmin 5.0.2
 - Choose your default IDE and browser
 
-### Add Web App Build To Local Server
-Deployment guilde :
-- On Github website, choice your build version on branches (e.j build-v1)
-- Get the link and clone it on your "/www" local repository
+### Setup Required Dependencies
+To be able to run our Application on your local environment, you must install some dependencies :
 
-> Optional : if you want to make your own build, [check it out](#web-app-environment)
+- Install NodeJS and NPM - [guide here](#web-app-environment)
+- Install Python  - [guide here](#python)
+
+### Run Web Application
+Running guide :
+- Go on the official latest build of WafCam, [here build v3](https://github.com/PierreYvesO/wafcam/tree/build-v3)
+- Clone it into your local server directory (usually at /www)
+- Open new terminal from your operating system and go to the directory
+```
+cd C:\wamp64\www\
+```
+- Install dependencies/updates from NodeJS and NPM
+```
+npm install
+```
+- Start the application
+```
+npm start
+```
+- After that your application is running, you must enable access to Web Local API. Go on the following directory
+```
+cd C:\wamp64\www\wafcam\web\
+```
+- And run the following command
+```
+node src/routes.js
+``` 
+You are now able to check your working application on your computer (default port is 3000)
+
+### Run Image Processing
+Running guide :
+complete with PY
 
 ## Development Setup
 
@@ -65,6 +94,13 @@ npm start
 npm run build
 ```
 
+#### Add Web App Build To Local Server
+Deployment guide :
+- On Github website, choice your build version on branches (e.j build-v1)
+- Get the link and clone it on your "/www" local repository
+
+> Optional : if you want to make your own build, [check it out](#web-app-environment)
+
 ### Database (with PhpMyAdmin)
 Install [WampServer v3.2.3](#setup-local-server-wamp-server-on-windows-10)
 
@@ -105,7 +141,7 @@ Launch the python back-end
 cd 'F:\Path\to\wafcam'
 $env:PYTHONPATH = 'F:\Path\to\wafcam'
 venv\Scripts\activate
-.\python_back\test\test.py
+.\python_back\launchWAFCAM.py
 ```
 
 ### Unused/Optional Setup
