@@ -15,13 +15,19 @@ INTER_THRESHOLD = .25
 DISPLAYED = ["cat", "dog"]
 
 
-def display_detected(img, detected):
+def display_detected(img, detected, forbidden_areas):
     """
     Affiche les rectangles des objets detectés
     :param img: image dans laquelle afficher les rectangles
     :param detected: liste des rectangles a afficher
     :return: None
     """
+    for forbidden_area in forbidden_areas:
+        x, y, w, h = forbidden_area[3:]
+        cv2.rectangle(img, (x, y), (x + w, h + y), color=(0, 0, 255), thickness=1)
+        cv2.putText(img, forbidden_area[2],
+                    (x, y),
+                    cv2.FONT_HERSHEY_COMPLEX, .4, (0, 0, 255), 1)
     for elmt in detected:
         box = elmt[0]
         className = elmt[1]
@@ -98,7 +104,7 @@ def is_in_areas(objectBox, forbiddenAreas, triggeredAreas):
     """
     totalArea = 0
     for forbiddenArea in forbiddenAreas:
-        forbiddenBox = forbiddenArea[3:] # Take only the 4 rect infos (x y w h)
+        forbiddenBox = forbiddenArea[3:]  # Take only the 4 rect infos (x y w h)
 
         intersect = intersection_area(objectBox, forbiddenBox)
         # Ajoute l'id de la zone à la liste s'il y a collision
@@ -145,7 +151,8 @@ def tracked_object(new_center, detectedObjects):
 
 
 class Detection(Thread):
-    def __init__(self, camera, state_queue, detection_result_queue, forbidden_area_queue, displayed=None, forbidden_areas=None, display=False):
+    def __init__(self, camera, state_queue, detection_result_queue, forbidden_area_queue, displayed=None,
+                 forbidden_areas=None, display=False):
         """
         Lance un Tread de detection sur un flux video donné.
         @param state_queue: queue de communication start/stop entre l'objet camera et detection
@@ -258,9 +265,11 @@ class Detection(Thread):
                     # Verifie si l'animal est dans une ou plusieurs zone interdite
                     if is_in_areas(box, self.forbidden_areas, triggeredAreas):
                         triggeredAreas.sort()
-                        if self.lastTriggeredArea != triggeredAreas[0] and self.lastTimeTriggeredArea - time.time() > 5:
+                        if self.lastTriggeredArea != triggeredAreas[0] and time.time() - self.lastTimeTriggeredArea > 5:
                             # Envoie seuelement la zone ou l'animal est le plus dedans
-                            self.forbidden_areas_queue.put(triggeredAreas[0])
+                            # Envoie les infos vers la camera
+
+                            self.forbidden_areas_queue.put((self.displayMap[className], triggeredAreas[0]))
                             # Evite la répétition d'envoi de log
                             self.lastTimeTriggeredArea = time.time()
 
@@ -288,7 +297,7 @@ class Detection(Thread):
             # pour debug
             if self.display:
                 # Affiche les rectangles
-                display_detected(img, detected)
+                display_detected(img, detected, self.forbidden_areas)
                 cv2.imshow("Output", img)
                 cv2.waitKey(1)
 
