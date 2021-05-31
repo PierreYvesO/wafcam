@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS `camera` (
   `ip_adress` varchar(200) NOT NULL,
   `user` varchar(45) NOT NULL,
   `password` varchar(200) NOT NULL,
-  `id_room` int(11) DEFAULT NULL,
+  `id_room` int(11) DEFAULT NOT NULL,
   PRIMARY KEY (`id_camera`),
   KEY `room_id_idx` (`id_room`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
