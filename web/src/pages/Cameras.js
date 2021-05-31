@@ -12,6 +12,7 @@ class Cameras extends React.Component {
   }
 
   state = {
+    cameras: this.props.cameras,
     imgHeight: 1,
     imgWidth: 1,
     imgNaturalHeight: 1,
@@ -56,9 +57,9 @@ class Cameras extends React.Component {
     var initialRectangles = [{}];
     var url = "";
     var idCamProps = null;
-    if (this.props.cameras.length !== 0) {
+    if (this.state.cameras.length !== 0) {
       if (this.state.imgHeight !== 1) {
-        initialRectangles = this.props.areas.filter(area => area.id_camera === this.props.cameras[this.state.tabValue].id_camera).map((area) => {
+        initialRectangles = this.props.areas.filter(area => area.id_camera === this.state.cameras[this.state.tabValue].id_camera).map((area) => {
           return {
             id: area.id_area,
             x: area.x * this.state.imgWidth / this.state.imgNaturalWidth,
@@ -71,9 +72,11 @@ class Cameras extends React.Component {
             name: area.name
           }
         });
-        idCamProps = this.props.cameras[this.state.tabValue].id_camera;
+        idCamProps = this.state.cameras[this.state.tabValue].id_camera;
       }
-      url = "http://" + this.props.cameras[this.state.tabValue].ip_adress + "/videostream.cgi?user=" + this.props.cameras[0].user + "&pwd=" + this.props.cameras[0].password;
+      url = "http://" + this.state.cameras[this.state.tabValue].ip_adress + "/videostream.cgi?user=" + this.state.cameras[0].user + "&pwd=" + this.state.cameras[0].password;
+    } else {
+      url = "./img/unknown_camera.jpg";
     }
 
     return (
@@ -81,18 +84,20 @@ class Cameras extends React.Component {
         <Navigation />
         <div className="Content">
           <h1>Caméras</h1>
-          <Paper>
-            <Tabs
-              value={this.state.tabValue}
-              onChange={this.handleChangeTab.bind(this)}
-              indicatorColor="primary"
-              textColor="primary"
-            >
-              {this.props.cameras.map((camera) => (
-                <Tab key={camera.id_camera} label={this.props.rooms.filter(room => room.id_room === camera.id_room)[0].name + ' (' + camera.ip_adress + ')'} disabled={this.state.editMode} />
-              ))}
-            </Tabs>
-          </Paper>
+          {this.state.cameras.length !== 0 && (
+            <Paper>
+              <Tabs
+                value={this.state.tabValue}
+                onChange={this.handleChangeTab.bind(this)}
+                indicatorColor="primary"
+                textColor="primary"
+              >
+                {this.state.cameras.map((camera) => (
+                  <Tab key={camera.id_camera} label={this.props.rooms.filter(room => room.id_room === camera.id_room)[0].name + ' (' + camera.ip_adress + ')'} disabled={this.state.editMode} />
+                ))}
+              </Tabs>
+            </Paper>
+          )}
           <div className="camTool">
             <img src={url} alt="webcam" onLoad={this.handleImageLoaded.bind(this)} />
             <CamTool
@@ -143,6 +148,7 @@ class Cameras extends React.Component {
                 }}
                 startIcon={this.state.editMode ? <Save /> : <Edit />}
                 size={"large"}
+                disabled={this.state.cameras.length === 0}
               >
                 {this.state.editMode ? "Enregistrer" : "Éditer"}
               </Button>

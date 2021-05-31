@@ -19,7 +19,11 @@ const Home = () => {
           L'équipe PatCam™
           </p>
         </Paper>
-        <img id="homeImg" src="./img/home.png" alt="demo" width="700" />
+        <div className="homeImgs">
+          <img src="./img/PATCAM_LOGO.ico" alt="logo_patcam" width="200" />
+          <img src="./img/home.png" alt="demo" width="600" />
+          <img src="./img/esiee.jpg" alt="logo_esiee" width="200" />
+        </div>
       </div>
     </>
   );
