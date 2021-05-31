@@ -83,9 +83,11 @@ const Rooms = (props) => {
   }
 
   function handleSaveRoom() {
-    axios.put('http://localhost:4000/room', roomToUpsert);
-    handleResetRoomForm();
-    window.location.reload();
+    if (roomToUpsert.name !== '') {
+      axios.put('http://localhost:4000/room', roomToUpsert);
+      handleResetRoomForm();
+      window.location.reload();
+    }
   }
 
   function handleDeleteCamera(id_camera) {
