@@ -97,8 +97,8 @@ class Database:
     def getCamerasFromID(self, cam_id):
         return self.buildSelect(CAMERA_TABLE, f"idcamera={cam_id}")
 
-    def getForbiddenAreas(self):
-        return self.buildSelect(FORBIDDEN_TABLE)
+    def getForbiddenAreas(self, id_area):
+        return self.buildSelect(FORBIDDEN_TABLE, f"id_camera={id_area}")
 
     def getCameraFromRoomWithID(self, id_room: int):
         self.wait_available()

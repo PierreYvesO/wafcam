@@ -47,7 +47,7 @@ class Camera:
             self.cap.set(10, 150)
 
         self.detection = Detection(self, self.detection_queue, self.detection_result, self.forbidden_access_queue,
-                                   self.db.getEntities(), self.db.getForbiddenAreas(), self.display)
+                                   self.db.getEntities(), self.db.getForbiddenAreas(self.id), self.display)
         self.detection.start()
 
     def displayCamera(self):
@@ -105,19 +105,18 @@ class Camera:
     @threaded
     def send_forbidden_access_infos(self):
 
-        res = {}
-        old_res = {}
         while self.cam_queue.empty():
             try:
-                res = self.forbidden_access_queue.get(timeout=2)
+                res = self.forbidden_access_queue.get(timeout=5)
+
+                # on garde la meme date pour tous les envois
+                timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                animal, (_, id_area)  = res
+                playsound("./python_back/byebye_patafix.mp3", block=False)
+                self.db.addDetectedInForbiddenAreaLog(animal, id_area, self.id, timestamp)
+                print(f"result_log_in_area = {animal}, {id_area}")
+                # self.websocket_queue.put("area")
+
             except Empty:
-                if old_res != res:
-                    # on garde la meme date pour tous les envois
-                    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                    for animal in res:
-                        playsound("./python_back/byebye_patafix.mp3", block=False)
-                        self.db.addDetectedInForbiddenAreaLog(animal, 0, self.id, timestamp)
-                        pass
-                    print("result_log_in_area = " + str(res))
-                    self.websocket_queue.put("area")
-                    res = old_res
+                pass
+
