@@ -50,8 +50,7 @@ node src/routes.js
 You are now able to check your working application on your computer (default port is 3000)
 
 ### Run Image Processing
-Running guide :
-complete with PY
+Running guide : [guide here](#python)
 
 ## Development Setup
 
