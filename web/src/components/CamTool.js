@@ -199,7 +199,7 @@ class CamTool extends React.Component {
   deleteRectangle = () => {
     for (let i = 0; i < this.state.rectangles.length; i++) {
       if (this.state.rectangles[i].id === this.state.selectedId) {
-        axios.delete('http://localhost:4000/area/' + this.state.selectedId);
+        axios.delete('http://92.89.142.198:4000/area/' + this.state.selectedId);
         this.state.rectangles.splice(i, 1);
         break;
       }

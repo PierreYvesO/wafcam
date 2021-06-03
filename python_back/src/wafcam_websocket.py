@@ -66,7 +66,7 @@ def launch(database_config, serv: WebSocketServer = None):
     db.closeConnection()
 
     send_update_ws()
-    launch_analysis(database_config)
+    # launch_analysis(database_config)
 
 
 @threaded

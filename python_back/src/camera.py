@@ -82,7 +82,7 @@ class Camera:
             temp = ip[:6]
         else:
             temp = ip
-        return 'http://' + user + ':' + pwd + '@' + temp
+        return 'http://' + user + ':' + pwd + '@' + temp + '/videostream.cgi'
 
     @threaded
     def save_infos(self):

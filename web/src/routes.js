@@ -6,9 +6,9 @@ const http = require('http');
 var WebSocket = require('ws')
 
 const connection = mysql.createPool({
-  host     : 'localhost',
-  user     : 'root',
-  password : '',
+  host     : '92.89.142.198',
+  user     : 'patcam_user',
+  password : 'PaTcAm78',
   database : '2z2tz_patcam_test'
 });
 
